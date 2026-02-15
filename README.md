@@ -1,40 +1,66 @@
-# YJH - Quality Management Platform
+# YJH — Your Job's Here
 
-YJH is an integrated QA platform that combines bug tracking, test management, wiki knowledge base, kanban, and release risk analytics in one lightweight PHP + SQLite stack.
+**Единая платформа управления качеством и разработкой**
 
-## Why YJH
-- One tool instead of Jira + TestRail + Confluence split.
-- Fast local deployment (no heavy infra required).
-- Built-in traceability: `test case -> execution -> bug -> commit`.
-- Product-level QA features: Risk Engine, checklist-driven testing, auto bug creation, wiki versioning.
+[![Лицензия: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PHP](https://img.shields.io/badge/PHP-8.0%2B-777BB4?logo=php)](https://php.net)
+[![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite)](https://sqlite.org)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap)](https://getbootstrap.com)
 
-## Core Modules
-- Bugs: `bugs.php`, `bug.php`, `api/bugs.php`
-- Test Management: `testplans.php`, `testplan.php`, `testcase.php`, `testruns.php`, `testrun.php`
-- Wiki: `wiki.php`, `wiki-page.php`, `api/wiki.php`
-- Kanban: `kanban.php`, `api/kanban.php`
-- Analytics: `index.php`, `reports.php`, `assets/js/charts.js`
-- Global Search: `api/search.php`, `assets/js/search.js`
+---
 
-## Tech Stack
-- Backend: PHP (procedural MVC-style pages + API endpoints)
-- Database: SQLite (`database.sqlite`)
-- UI: Bootstrap 5 + Chart.js + custom JS
-- Security: CSRF protection + server-side escaping helpers
+## 📸 СКРИНШОТ
 
-## Documentation
-- Architecture: `docs/ARCHITECTURE.md`
-- Database: `docs/DATABASE.md`
-- API: `docs/API.md`
-- Quick Start: `docs/QUICKSTART.md`
-- Install: `docs/INSTALL.md`
-- User Guide: `docs/USER_GUIDE.md`
-- Features: `docs/FEATURES.md`
-- Comparison: `docs/COMPARISON.md`
-- Roadmap: `docs/ROADMAP.md`
-- Why YJH: `docs/WHY_YJH.md`
-- Visualizations: `docs/VISUALIZATIONS.md`
-- Engineering Notes: `docs/ENGINEERING_NOTES.md`
+![YJH Dashboard](docs/assets/screenshots/dashboard.png)
 
-## Quick Start
-See `docs/QUICKSTART.md`.
+---
+
+## 🔥 О ПРОЕКТЕ
+
+**YJH** — это полностью бесплатная, локально разворачиваемая платформа, объединяющая:
+
+| Модуль | Что заменяет |
+|--------|--------------|
+| ✅ Баг-трекинг | Jira |
+| ✅ Тест-менеджмент | TestRail |
+| ✅ База знаний (wiki) | Confluence |
+| ✅ Канбан-доска | Trello |
+| ✅ Git-интеграция | Автозакрытие багов |
+| ✅ Командный календарь | Отпуска, больничные |
+| ✅ Risk Engine | Уникальная аналитика |
+
+**Ключевые особенности:**
+- 🌐 2 языка: Русский, English
+- 🌓 Тёмная и светлая темы
+- 🔍 Глобальный поиск (Ctrl+K)
+- 💾 Черновики (автосохранение)
+- ⚡ Горячие клавиши
+
+---
+
+## 🚀 БЫСТРЫЙ СТАРТ
+
+```bash
+git clone https://github.com/твойлогин/YJH.git
+cd YJH
+php -S localhost:8000
+```
+
+Открой браузер: http://localhost:8000
+
+Логин: admin@yujin.ho  
+Пароль: admin123
+
+---
+
+## 📚 ДОКУМЕНТАЦИЯ
+
+- Установка
+- Архитектура
+- API
+
+---
+
+## 📜 ЛИЦЕНЗИЯ
+
+MIT License © 2026 YJH — Your Job's Here / Евгений Головатюк
