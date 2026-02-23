@@ -74,6 +74,12 @@ $checklistText = $case ? implode("\n", json_decode($case['checklist_json'], true
                     <label class="form-label">Description</label>
                     <textarea name="description" class="form-control" rows="2"><?php echo h($case['description'] ?? ''); ?></textarea>
                 </div>
+                <div class="col-12 d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-ai-action="generate_test_cases">🤖 Згенерувати тест-кейс</button>
+                </div>
+                <div class="col-12">
+                    <div class="alert alert-info d-none mb-0" data-ai-target="test_cases_result"></div>
+                </div>
                 <div class="col-12">
                     <label class="form-label">Preconditions</label>
                     <textarea name="preconditions" class="form-control" rows="2"><?php echo h($case['preconditions'] ?? ''); ?></textarea>

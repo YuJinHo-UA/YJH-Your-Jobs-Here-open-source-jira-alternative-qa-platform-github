@@ -20,6 +20,7 @@ function db(): PDO
 
     initialize_schema($pdo);
     apply_security_migrations($pdo);
+    apply_ai_migrations($pdo);
 
     if ($isNew) {
         seed_demo_data($pdo);
@@ -676,6 +677,53 @@ function apply_security_migrations(PDO $pdo): void
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_rate_limit_key_time ON rate_limit_entries(key, attempted_at)');
 
     backfill_encrypted_emails($pdo);
+}
+
+function apply_ai_migrations(PDO $pdo): void
+{
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS ai_cache (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            prompt_hash TEXT UNIQUE NOT NULL,
+            prompt TEXT NOT NULL,
+            response TEXT NOT NULL,
+            model TEXT NOT NULL,
+            tokens_used INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )'
+    );
+
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS ai_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            action_type TEXT NOT NULL,
+            prompt TEXT,
+            response TEXT,
+            tokens_used INTEGER,
+            duration_ms INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )'
+    );
+
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS ai_templates (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            template_type TEXT NOT NULL,
+            template_text TEXT NOT NULL,
+            is_public BOOLEAN DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )'
+    );
+
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_ai_cache_hash ON ai_cache(prompt_hash)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_ai_logs_user_created ON ai_logs(user_id, created_at)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_ai_logs_action_created ON ai_logs(action_type, created_at)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_ai_templates_user_type ON ai_templates(user_id, template_type)');
 }
 
 function ensure_column(PDO $pdo, string $table, string $column, string $definition): void

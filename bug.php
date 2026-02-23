@@ -152,6 +152,16 @@ if ($id) {
                     <label class="form-label">Title</label>
                     <input type="text" name="title" class="form-control" value="<?php echo h($bug['title'] ?? ''); ?>" required>
                 </div>
+                <div class="col-12 d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-ai-action="assist_bug">🤖 Допомогти з описом</button>
+                    <button type="button" class="btn btn-outline-warning btn-sm" data-ai-action="check_duplicates">🔍 Перевірити дублікати</button>
+                </div>
+                <div class="col-12">
+                    <div class="alert alert-info d-none mb-0" data-ai-target="bug_result"></div>
+                </div>
+                <div class="col-12">
+                    <div class="alert alert-warning d-none mb-0" data-ai-target="duplicates_result"></div>
+                </div>
                 <div class="col-12">
                     <label class="form-label">Description</label>
                     <textarea name="description" class="form-control" rows="3"><?php echo h($bug['description'] ?? ''); ?></textarea>

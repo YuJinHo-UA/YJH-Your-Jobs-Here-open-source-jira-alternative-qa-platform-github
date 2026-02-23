@@ -11,7 +11,9 @@ $topModules = fetch_all("SELECT p.name, COUNT(*) as total FROM bugs b JOIN proje
 <div class="app-content">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Reports</h2>
+        <button type="button" class="btn btn-outline-primary btn-sm" data-ai-action="generate_report">📈 Згенерувати AI-звіт</button>
     </div>
+    <div class="alert alert-info d-none" data-ai-target="report_result"></div>
     <div class="row g-4">
         <div class="col-md-3">
             <div class="card p-3">

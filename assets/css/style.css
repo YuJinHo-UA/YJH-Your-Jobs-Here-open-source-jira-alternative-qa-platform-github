@@ -860,3 +860,66 @@ html.theme-dark .toast .btn-close {
     opacity: 0.9;
 }
 
+.ai-chat-modal {
+    border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.ai-chat-header {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+}
+
+.ai-chat-body {
+    background: #ffffff;
+}
+
+.ai-chat-messages {
+    height: 260px;
+    overflow-y: auto;
+    background: #f8fafc;
+    border-color: rgba(148, 163, 184, 0.35) !important;
+}
+
+.ai-chat-messages .small.text-muted {
+    color: #64748b !important;
+}
+
+.theme-dark .ai-chat-modal {
+    background: #111b2f;
+    border-color: rgba(148, 163, 184, 0.35);
+    box-shadow: 0 20px 40px rgba(2, 6, 23, 0.65);
+}
+
+.theme-dark .ai-chat-header {
+    background: #111b2f;
+    border-bottom-color: rgba(148, 163, 184, 0.3);
+}
+
+.theme-dark .ai-chat-body {
+    background: #0b1220;
+}
+
+.theme-dark .ai-chat-messages {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-color: rgba(148, 163, 184, 0.4) !important;
+}
+
+.theme-dark .ai-chat-messages .small.text-muted {
+    color: #94a3b8 !important;
+}
+
+.theme-dark #aiChatInput {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-color: rgba(148, 163, 184, 0.4);
+}
+
+.theme-dark #aiChatInput::placeholder {
+    color: #94a3b8;
+}
+
+.theme-dark #aiChatSend.btn-primary {
+    border-color: #3b82f6;
+    background: #2563eb;
+}
+

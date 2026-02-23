@@ -1,0 +1,12 @@
+Сформуй структурований баг-опис на основі вхідних даних.
+
+Title: {{title}}
+Description: {{description}}
+
+Поверни JSON:
+{
+  "steps_to_reproduce": ["..."],
+  "expected_result": ["..."],
+  "actual_result": ["..."],
+  "analysis": "короткий аналіз"
+}
