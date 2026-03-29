@@ -62,4 +62,4 @@ php -S localhost:8000
 
 ## 📜 ЛИЦЕНЗИЯ
 
-MIT License © 2026 YJH — Your Job's Here / Евгений Головатюк
+MIT License © 2026 YJH — Your Job's Here / Evhen Holovatyuk
