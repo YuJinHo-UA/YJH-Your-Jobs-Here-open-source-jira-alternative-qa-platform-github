@@ -3,10 +3,49 @@
     const dropzone = document.getElementById('bugAttachmentDropzone');
     const input = document.getElementById('bugAttachmentInput');
     const list = document.getElementById('bugAttachmentList');
+    const previewModalEl = document.getElementById('bugAttachmentPreviewModal');
+    const previewImage = document.getElementById('bugAttachmentPreviewImage');
+    const previewTitle = document.getElementById('bugAttachmentPreviewTitle');
+    const previewMeta = document.getElementById('bugAttachmentPreviewMeta');
+    const previewPrevBtn = document.getElementById('bugAttachmentPrevBtn');
+    const previewNextBtn = document.getElementById('bugAttachmentNextBtn');
+    const previewOpenOriginal = document.getElementById('bugAttachmentOpenOriginal');
+    const previewModal = previewModalEl && window.bootstrap ? new window.bootstrap.Modal(previewModalEl) : null;
+    let currentIndex = -1;
 
     if (!form || !dropzone || !input || !list) {
         return;
     }
+
+    const t = (value) => (window.uiT ? window.uiT(value) : value);
+    const getItems = () => Array.from(list.querySelectorAll('a.attachment-item'));
+
+    const renderPreviewAt = (index) => {
+        const items = getItems();
+        if (!items.length || !previewModal || !previewImage) return;
+        currentIndex = (index + items.length) % items.length;
+        const link = items[currentIndex];
+        const img = link.querySelector('img');
+        const filename = link.querySelector('.attachment-name')?.textContent || 'Screenshot';
+        const meta = link.querySelector('.attachment-author')?.textContent || '';
+        const href = link.getAttribute('href') || '';
+        previewImage.src = href;
+        previewImage.alt = filename;
+        if (previewTitle) previewTitle.textContent = filename;
+        if (previewMeta) previewMeta.textContent = meta;
+        if (previewOpenOriginal) previewOpenOriginal.href = href;
+    };
+
+    const bindPreviewHandlers = (item) => {
+        item.addEventListener('click', (event) => {
+            if (!previewModal) return;
+            event.preventDefault();
+            const items = getItems();
+            const idx = items.indexOf(item);
+            renderPreviewAt(idx);
+            previewModal.show();
+        });
+    };
 
     const renderItem = (file) => {
         const link = document.createElement('a');
@@ -36,6 +75,7 @@
         link.appendChild(img);
         link.appendChild(meta);
         list.prepend(link);
+        bindPreviewHandlers(link);
     };
 
     const uploadFiles = async (files) => {
@@ -92,4 +132,40 @@
     dropzone.addEventListener('drop', (event) => {
         uploadFiles(event.dataTransfer.files);
     });
+
+    dropzone.addEventListener('paste', (event) => {
+        const items = event.clipboardData?.items || [];
+        const files = [];
+        for (const item of items) {
+            if (item.kind === 'file') {
+                const file = item.getAsFile();
+                if (file && file.type.startsWith('image/')) {
+                    files.push(file);
+                }
+            }
+        }
+        if (files.length) {
+            uploadFiles(files);
+        }
+    });
+
+    getItems().forEach(bindPreviewHandlers);
+
+    if (previewPrevBtn) {
+        previewPrevBtn.addEventListener('click', () => renderPreviewAt(currentIndex - 1));
+    }
+    if (previewNextBtn) {
+        previewNextBtn.addEventListener('click', () => renderPreviewAt(currentIndex + 1));
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (!previewModalEl || !previewModalEl.classList.contains('show')) return;
+        if (event.key === 'ArrowLeft') renderPreviewAt(currentIndex - 1);
+        if (event.key === 'ArrowRight') renderPreviewAt(currentIndex + 1);
+    });
+
+    dropzone.title = t('Click, drag, or paste screenshots');
+    if (previewPrevBtn) previewPrevBtn.textContent = t('Prev');
+    if (previewNextBtn) previewNextBtn.textContent = t('Next');
+    if (previewOpenOriginal) previewOpenOriginal.textContent = t('Open original');
 })();

@@ -29,11 +29,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ]);
 
     if ($status === 'fail' && post_param('create_bug') === '1') {
-        $case = fetch_one('SELECT * FROM test_cases WHERE id = :id', [':id' => post_param('case_id')]);
+        $case = fetch_one(
+            'SELECT tc.*, ts.plan_id, tp.project_id
+             FROM test_cases tc
+             JOIN test_suites ts ON ts.id = tc.suite_id
+             JOIN test_plans tp ON tp.id = ts.plan_id
+             WHERE tc.id = :id',
+            [':id' => post_param('case_id')]
+        );
         if ($case) {
             $stmt = db()->prepare('INSERT INTO bugs (project_id, title, description, steps_to_reproduce, expected_result, actual_result, severity, priority, status, reporter_id) VALUES (:project_id, :title, :description, :steps, :expected, :actual, :severity, :priority, :status, :reporter_id)');
             $stmt->execute([
-                ':project_id' => 1,
+                ':project_id' => (int)$case['project_id'],
                 ':title' => 'Failed test: ' . $case['title'],
                 ':description' => $case['description'],
                 ':steps' => $case['steps_json'],
@@ -47,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $bugId = (int)db()->lastInsertId();
             $stmt = db()->prepare('UPDATE test_executions SET bug_id=:bug_id WHERE id=:id');
             $stmt->execute([':bug_id' => $bugId, ':id' => $executionId]);
+            add_toast('Bug created from failed execution', 'success');
         }
     }
 
@@ -54,7 +62,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect('/testrun.php?id=' . $id);
 }
 
-$executions = fetch_all('SELECT te.*, tc.title FROM test_executions te JOIN test_cases tc ON tc.id=te.test_case_id WHERE te.test_run_id = :id', [':id' => $id]);
+$executions = fetch_all(
+    'SELECT te.*, tc.title, tc.expected_result_json
+     FROM test_executions te
+     JOIN test_cases tc ON tc.id=te.test_case_id
+     WHERE te.test_run_id = :id',
+    [':id' => $id]
+);
 ?>
 <div class="app-content">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -68,6 +82,7 @@ $executions = fetch_all('SELECT te.*, tc.title FROM test_executions te JOIN test
                 <tr>
                     <th>Case</th>
                     <th>Status</th>
+                    <th>Expected Result</th>
                     <th>Actual Result</th>
                     <th>Notes</th>
                     <th></th>
@@ -88,12 +103,20 @@ $executions = fetch_all('SELECT te.*, tc.title FROM test_executions te JOIN test
                                 <?php endforeach; ?>
                             </select>
                     </td>
+                    <td>
+                        <?php
+                        $expected = json_decode((string)($execution['expected_result_json'] ?? ''), true);
+                        echo h((string)($expected[0] ?? ''));
+                        ?>
+                    </td>
                     <td><input name="actual_result" class="form-control form-control-sm" value="<?php echo h($execution['actual_result'] ?? ''); ?>"></td>
                     <td><input name="notes" class="form-control form-control-sm" value="<?php echo h($execution['notes'] ?? ''); ?>"></td>
                     <td class="d-flex gap-2">
                         <button class="btn btn-sm btn-primary">Save</button>
                         <?php if ($execution['status'] === 'fail' && !$execution['bug_id']): ?>
                             <button class="btn btn-sm btn-outline-danger" name="create_bug" value="1">Create bug</button>
+                        <?php elseif ((int)($execution['bug_id'] ?? 0) > 0): ?>
+                            <a class="btn btn-sm btn-outline-secondary" href="/bug.php?id=<?php echo (int)$execution['bug_id']; ?>">Open bug</a>
                         <?php endif; ?>
                     </td>
                 </tr>

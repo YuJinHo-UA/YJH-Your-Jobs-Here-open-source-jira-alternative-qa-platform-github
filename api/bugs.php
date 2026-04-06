@@ -18,6 +18,12 @@ if ($method === 'GET') {
 if ($method === 'POST') {
     $payload = json_decode(file_get_contents('php://input'), true) ?: [];
     $id = $payload['id'] ?? null;
+    $assigneeId = isset($payload['assignee_id']) && (int)$payload['assignee_id'] > 0 ? (int)$payload['assignee_id'] : null;
+    $dueDate = trim((string)($payload['due_date'] ?? date('Y-m-d')));
+
+    if ($assigneeId !== null && !is_user_available($assigneeId, $dueDate)) {
+        json_response(['error' => 'User is not available (vacation/sick leave) on this date'], 400);
+    }
 
     if ($id) {
         $stmt = db()->prepare('UPDATE bugs SET title=:title, description=:description, status=:status, priority=:priority, severity=:severity, assignee_id=:assignee_id, updated_at=CURRENT_TIMESTAMP WHERE id=:id');
@@ -27,8 +33,12 @@ if ($method === 'POST') {
             ':status' => $payload['status'] ?? 'new',
             ':priority' => $payload['priority'] ?? 'medium',
             ':severity' => $payload['severity'] ?? 'major',
-            ':assignee_id' => $payload['assignee_id'] ?? null,
+            ':assignee_id' => $assigneeId,
             ':id' => $id,
+        ]);
+        record_activity('updated', 'bug', (int)$id, [
+            'title' => (string)($payload['title'] ?? ''),
+            'status' => (string)($payload['status'] ?? 'new'),
         ]);
         json_response(['status' => 'updated']);
     }
@@ -43,7 +53,12 @@ if ($method === 'POST') {
         ':status' => $payload['status'] ?? 'new',
         ':reporter_id' => $user['id'],
     ]);
-    json_response(['status' => 'created', 'id' => db()->lastInsertId()]);
+    $newId = (int)db()->lastInsertId();
+    record_activity('created', 'bug', $newId, [
+        'title' => (string)($payload['title'] ?? 'Untitled'),
+        'project_id' => (int)($payload['project_id'] ?? 1),
+    ]);
+    json_response(['status' => 'created', 'id' => $newId]);
 }
 
 json_response(['error' => 'Method not allowed'], 405);

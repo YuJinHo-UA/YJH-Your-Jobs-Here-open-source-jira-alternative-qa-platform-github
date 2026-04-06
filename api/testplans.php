@@ -23,7 +23,12 @@ if ($method === 'POST') {
         ':status' => $payload['status'] ?? 'draft',
         ':created_by' => $user['id'],
     ]);
-    json_response(['status' => 'created', 'id' => db()->lastInsertId()]);
+    $newId = (int)db()->lastInsertId();
+    record_activity('created', 'test_plan', $newId, [
+        'name' => (string)($payload['name'] ?? 'Untitled'),
+        'project_id' => (int)($payload['project_id'] ?? 1),
+    ]);
+    json_response(['status' => 'created', 'id' => $newId]);
 }
 
 json_response(['error' => 'Method not allowed'], 405);

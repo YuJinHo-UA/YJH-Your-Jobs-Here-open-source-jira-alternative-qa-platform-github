@@ -14,7 +14,19 @@ $filters = [
     'closed_date' => get_param('closed_date'),
 ];
 
-$sql = "SELECT b.*, p.name as project_name, u.username as assignee FROM bugs b JOIN projects p ON p.id=b.project_id LEFT JOIN users u ON u.id=b.assignee_id WHERE 1=1";
+$sql = "SELECT b.*, p.name as project_name, u.username as assignee,
+        (
+            SELECT ua.type
+            FROM user_availability ua
+            WHERE ua.user_id = b.assignee_id
+              AND ua.start_date <= date('now')
+              AND ua.end_date >= date('now')
+            LIMIT 1
+        ) as assignee_unavailability
+        FROM bugs b
+        JOIN projects p ON p.id=b.project_id
+        LEFT JOIN users u ON u.id=b.assignee_id
+        WHERE 1=1";
 $params = [];
 if ($filters['status']) {
     $sql .= " AND b.status = :status";
@@ -49,6 +61,39 @@ $bugs = fetch_all($sql, $params);
 $projects = fetch_all('SELECT * FROM projects');
 $users = fetch_all('SELECT * FROM users');
 $savedFilters = fetch_all('SELECT * FROM saved_filters WHERE user_id = :id', [':id' => $user['id']]);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verify_csrf();
+    $action = (string)post_param('action');
+    if ($action === 'quick_update_bug') {
+        $bugId = (int)post_param('bug_id');
+        $title = trim((string)post_param('title'));
+        $status = (string)post_param('status');
+        $priority = (string)post_param('priority');
+        $severity = (string)post_param('severity');
+        $assigneeId = post_param('assignee_id') ?: null;
+        if (
+            $bugId > 0 &&
+            $title !== '' &&
+            in_array($status, ['new', 'assigned', 'in_progress', 'fixed', 'verified', 'closed', 'reopened'], true) &&
+            in_array($priority, ['highest', 'high', 'medium', 'low', 'lowest'], true) &&
+            in_array($severity, ['blocker', 'critical', 'major', 'minor', 'trivial'], true)
+        ) {
+            $stmt = db()->prepare('UPDATE bugs SET title=:title, status=:status, priority=:priority, severity=:severity, assignee_id=:assignee_id, updated_at=CURRENT_TIMESTAMP WHERE id=:id');
+            $stmt->execute([
+                ':title' => $title,
+                ':status' => $status,
+                ':priority' => $priority,
+                ':severity' => $severity,
+                ':assignee_id' => $assigneeId,
+                ':id' => $bugId,
+            ]);
+            add_toast('Bug row updated', 'success');
+        }
+        $qs = $_SERVER['QUERY_STRING'] ?? '';
+        redirect('/bugs.php' . ($qs !== '' ? ('?' . $qs) : ''));
+    }
+}
 ?>
 <div class="app-content">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -114,18 +159,58 @@ $savedFilters = fetch_all('SELECT * FROM saved_filters WHERE user_id = :id', [':
                     <th>Project</th>
                     <th>Status</th>
                     <th>Priority</th>
+                    <th>Severity</th>
                     <th>Assignee</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
             <?php foreach ($bugs as $bug): ?>
                 <tr>
-                    <td><a href="/bug.php?id=<?php echo $bug['id']; ?>" data-preview-type="bug" data-preview-id="<?php echo $bug['id']; ?>">#<?php echo $bug['id']; ?></a></td>
-                    <td><?php echo h($bug['title']); ?></td>
-                    <td><?php echo h($bug['project_name']); ?></td>
-                    <td><?php echo h($bug['status']); ?></td>
-                    <td><?php echo h($bug['priority']); ?></td>
-                    <td><?php echo h($bug['assignee'] ?? ''); ?></td>
+                    <form method="post">
+                        <input type="hidden" name="csrf_token" value="<?php echo h(csrf_token()); ?>">
+                        <input type="hidden" name="action" value="quick_update_bug">
+                        <input type="hidden" name="bug_id" value="<?php echo (int)$bug['id']; ?>">
+                        <td><a href="/bug.php?id=<?php echo $bug['id']; ?>" data-preview-type="bug" data-preview-id="<?php echo $bug['id']; ?>">#<?php echo $bug['id']; ?></a></td>
+                        <td><input class="form-control form-control-sm" name="title" value="<?php echo h($bug['title']); ?>" required></td>
+                        <td><?php echo h($bug['project_name']); ?></td>
+                        <td>
+                            <select class="form-select form-select-sm" name="status">
+                                <?php foreach (['new','assigned','in_progress','fixed','verified','closed','reopened'] as $status): ?>
+                                    <option value="<?php echo $status; ?>" <?php echo $bug['status'] === $status ? 'selected' : ''; ?>><?php echo $status; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm" name="priority">
+                                <?php foreach (['highest','high','medium','low','lowest'] as $priority): ?>
+                                    <option value="<?php echo $priority; ?>" <?php echo $bug['priority'] === $priority ? 'selected' : ''; ?>><?php echo $priority; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm" name="severity">
+                                <?php foreach (['blocker','critical','major','minor','trivial'] as $severity): ?>
+                                    <option value="<?php echo $severity; ?>" <?php echo $bug['severity'] === $severity ? 'selected' : ''; ?>><?php echo $severity; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm" name="assignee_id">
+                                <option value="">Unassigned</option>
+                                <?php foreach ($users as $u): ?>
+                                    <option value="<?php echo (int)$u['id']; ?>" <?php echo (string)$bug['assignee_id'] === (string)$u['id'] ? 'selected' : ''; ?>><?php echo h($u['username']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <?php if (!empty($bug['assignee_unavailability'])): ?>
+                                <div class="small text-warning mt-1">⚠️ unavailable today (<?php echo h((string)$bug['assignee_unavailability']); ?>)</div>
+                            <?php endif; ?>
+                        </td>
+                        <td class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" type="submit">Update</button>
+                            <a class="btn btn-sm btn-outline-secondary" href="/bug.php?id=<?php echo $bug['id']; ?>">Open</a>
+                        </td>
+                    </form>
                 </tr>
             <?php endforeach; ?>
             </tbody>

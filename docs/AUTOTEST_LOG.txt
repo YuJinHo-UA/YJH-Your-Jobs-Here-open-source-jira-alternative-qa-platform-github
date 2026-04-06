@@ -1,0 +1,10 @@
+2026-04-06 14:10:25 | START autotests
+2026-04-06 14:10:25 | INIT user=1 project=1 suite=1 plan=1
+2026-04-06 14:10:25 | AT-1 row=(33, 'AT_BUG_141025')
+2026-04-06 14:10:25 | AT-2 duplicate blocked: UNIQUE constraint failed: users.email
+2026-04-06 14:10:25 | AT-3 join=('AT_TC_141025', 'AT_LINKBUG_141025')
+2026-04-06 14:10:25 | AT-4 invalid status blocked: CHECK constraint failed: status IN ('new','assigned','in_progress','fixed','verified','closed','reopened')
+2026-04-06 14:10:25 | AT-5 foreign key blocked: FOREIGN KEY constraint failed
+2026-04-06 14:10:25 | AT-6 translation cache duplicate blocked: UNIQUE constraint failed: translation_cache.source_lang, translation_cache.target_lang, translation_cache.text_hash
+2026-04-06 14:10:25 | AT-7 board card order=(1,)
+2026-04-06 14:10:25 | ROLLBACK complete; no data persisted

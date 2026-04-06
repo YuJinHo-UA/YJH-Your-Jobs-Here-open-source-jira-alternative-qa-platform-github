@@ -90,6 +90,27 @@ if ($id) {
 }
 
 $comments = $id ? fetch_all('SELECT c.*, u.username FROM bug_comments c JOIN users u ON u.id=c.user_id WHERE bug_id = :id ORDER BY created_at DESC', [':id' => $id]) : [];
+$attachments = [];
+if ($id) {
+    $attachmentsOrder = 'uploaded_at';
+    $attachmentsInfo = fetch_all('PRAGMA table_info(attachments)');
+    $attachmentColumns = array_map(static fn(array $column): string => (string)($column['name'] ?? ''), $attachmentsInfo);
+    if (!in_array('uploaded_at', $attachmentColumns, true) && in_array('created_at', $attachmentColumns, true)) {
+        $attachmentsOrder = 'created_at';
+    }
+    if (!in_array($attachmentsOrder, $attachmentColumns, true)) {
+        $attachmentsOrder = 'id';
+    }
+
+    $attachments = fetch_all(
+        "SELECT a.*, u.username
+         FROM attachments a
+         LEFT JOIN users u ON u.id = a.uploaded_by
+         WHERE a.target_type = :target_type AND a.target_id = :target_id
+         ORDER BY a.$attachmentsOrder DESC",
+        [':target_type' => 'bug', ':target_id' => $id]
+    );
+}
 ?>
 <div class="app-content">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -130,6 +151,16 @@ $comments = $id ? fetch_all('SELECT c.*, u.username FROM bug_comments c JOIN use
                 <div class="col-12">
                     <label class="form-label">Title</label>
                     <input type="text" name="title" class="form-control" value="<?php echo h($bug['title'] ?? ''); ?>" required>
+                </div>
+                <div class="col-12 d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-outline-primary btn-sm" data-ai-action="assist_bug">🤖 Допомогти з описом</button>
+                    <button type="button" class="btn btn-outline-warning btn-sm" data-ai-action="check_duplicates">🔍 Перевірити дублікати</button>
+                </div>
+                <div class="col-12">
+                    <div class="alert alert-info d-none mb-0" data-ai-target="bug_result"></div>
+                </div>
+                <div class="col-12">
+                    <div class="alert alert-warning d-none mb-0" data-ai-target="duplicates_result"></div>
                 </div>
                 <div class="col-12">
                     <label class="form-label">Description</label>
@@ -204,6 +235,53 @@ $comments = $id ? fetch_all('SELECT c.*, u.username FROM bug_comments c JOIN use
     </div>
 
     <?php if ($id): ?>
+        <div class="card p-3 mb-4">
+            <h5 class="mb-3">Screenshots</h5>
+            <form id="bugAttachmentForm" class="mb-3" onsubmit="return false;">
+                <input type="hidden" name="csrf_token" value="<?php echo h(csrf_token()); ?>">
+                <input type="hidden" name="target_type" value="bug">
+                <input type="hidden" name="target_id" value="<?php echo (int)$id; ?>">
+                <input type="file" id="bugAttachmentInput" class="d-none" accept="image/*" multiple>
+                <div id="bugAttachmentDropzone" class="bug-attachment-dropzone" role="button" tabindex="0">
+                    <div class="fw-semibold">Upload screenshots</div>
+                    <div class="text-muted small">Click, drag, or paste screenshots here (PNG, JPG, GIF, WEBP, up to 8MB each)</div>
+                </div>
+            </form>
+            <div id="bugAttachmentList" class="bug-attachment-list">
+                <?php foreach ($attachments as $file): ?>
+                    <a class="attachment-item" href="<?php echo h($file['filepath']); ?>" target="_blank" rel="noopener" data-attachment-preview="1">
+                        <img src="<?php echo h($file['filepath']); ?>" alt="<?php echo h($file['filename']); ?>" loading="lazy">
+                        <div class="attachment-meta">
+                            <div class="attachment-name"><?php echo h($file['filename']); ?></div>
+                            <div class="attachment-author text-muted small">
+                                <?php echo h((string)($file['username'] ?? '')); ?> | <?php echo h((string)($file['created_at'] ?? '')); ?>
+                            </div>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+
+            <div class="modal fade" id="bugAttachmentPreviewModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="bugAttachmentPreviewTitle">Screenshot</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img id="bugAttachmentPreviewImage" src="" alt="" class="img-fluid rounded">
+                            <div id="bugAttachmentPreviewMeta" class="text-muted small mt-2"></div>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" id="bugAttachmentPrevBtn">Prev</button>
+                            <a class="btn btn-outline-primary" id="bugAttachmentOpenOriginal" href="#" target="_blank" rel="noopener">Open original</a>
+                            <button type="button" class="btn btn-outline-secondary" id="bugAttachmentNextBtn">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card p-3">
             <h5>Comments</h5>
             <form method="post">

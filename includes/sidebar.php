@@ -12,6 +12,7 @@
         <a class="nav-link <?php echo is_active('/reports.php'); ?>" href="/reports.php"><i class="fa-solid fa-chart-line"></i> Reports</a>
         <?php if (($user['role'] ?? '') === 'admin') : ?>
         <a class="nav-link <?php echo is_active('/admin/users.php'); ?>" href="/admin/users.php"><i class="fa-solid fa-users"></i> Users</a>
+        <a class="nav-link <?php echo is_active('/admin/console.php'); ?>" href="/admin/console.php"><i class="fa-solid fa-terminal"></i> Admin Console</a>
         <?php endif; ?>
     </nav>
     <div class="sidebar-footer">

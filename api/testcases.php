@@ -25,7 +25,12 @@ if ($method === 'POST') {
         ':expected_result_json' => json_encode($payload['expected'] ?? []),
         ':created_by' => $user['id'],
     ]);
-    json_response(['status' => 'created', 'id' => db()->lastInsertId()]);
+    $newId = (int)db()->lastInsertId();
+    record_activity('created', 'test_case', $newId, [
+        'title' => (string)($payload['title'] ?? 'Untitled'),
+        'suite_id' => (int)($payload['suite_id'] ?? 1),
+    ]);
+    json_response(['status' => 'created', 'id' => $newId]);
 }
 
 json_response(['error' => 'Method not allowed'], 405);

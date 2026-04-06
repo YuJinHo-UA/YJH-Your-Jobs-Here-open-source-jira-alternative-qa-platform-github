@@ -5,6 +5,24 @@
     const cardIdField = document.getElementById('kanbanCardId');
     const submitBtn = document.getElementById('kanbanCardSubmit');
     const cancelBtn = document.getElementById('kanbanCardCancel');
+    const addColumnBtn = document.getElementById('kanbanAddColumnBtn');
+    const columnModalEl = document.getElementById('kanbanColumnModal');
+    const columnNameInput = document.getElementById('kanbanColumnNameInput');
+    const columnCreateSubmit = document.getElementById('kanbanColumnCreateSubmit');
+    const columnModal = columnModalEl && window.bootstrap ? new window.bootstrap.Modal(columnModalEl) : null;
+    const cardTypeSelect = document.getElementById('kanbanCardType');
+    const bugPickerWrap = document.getElementById('kanbanBugPickerWrap');
+    const testCasePickerWrap = document.getElementById('kanbanTestCasePickerWrap');
+
+    if (columnModalEl) {
+        const modalTitle = columnModalEl.querySelector('.modal-title');
+        const label = columnModalEl.querySelector('label[for="kanbanColumnNameInput"]');
+        const cancel = columnModalEl.querySelector('[data-bs-dismiss="modal"]');
+        if (modalTitle) modalTitle.textContent = t('Create column');
+        if (label) label.textContent = t('Column name');
+        if (cancel) cancel.textContent = t('Cancel');
+        if (columnCreateSubmit) columnCreateSubmit.textContent = t('Create');
+    }
     let dragged = null;
     let dragInProgress = false;
 
@@ -23,12 +41,25 @@
 
     const fillFormFromCard = (card) => {
         if (!form) return;
+        if (cardTypeSelect) {
+            cardTypeSelect.value = card.dataset.bugId
+                ? 'bug'
+                : (card.dataset.testCaseId ? 'test_case' : ((card.dataset.labels || '').includes('feature') ? 'feature' : 'task'));
+        }
         form.querySelector('[name="title"]').value = card.dataset.title || '';
         form.querySelector('[name="description"]').value = card.dataset.description || '';
         form.querySelector('[name="labels"]').value = card.dataset.labels || '';
         form.querySelector('[name="due_date"]').value = card.dataset.dueDate || '';
         form.querySelector('[name="assignee_id"]').value = card.dataset.assigneeId || '';
         form.querySelector('[name="column_id"]').value = card.dataset.columnId || '';
+        const bugField = form.querySelector('[name="source_bug_id"]');
+        if (bugField) {
+            bugField.value = card.dataset.bugId || '0';
+        }
+        const testCaseField = form.querySelector('[name="source_test_case_id"]');
+        if (testCaseField) {
+            testCaseField.value = card.dataset.testCaseId || '0';
+        }
         if (cardIdField) {
             cardIdField.value = card.dataset.cardId || '';
         }
@@ -39,6 +70,14 @@
         if (cancelBtn) {
             cancelBtn.classList.remove('d-none');
             cancelBtn.textContent = t('Cancel edit');
+        }
+        if (cardTypeSelect) {
+            if (bugPickerWrap) {
+                bugPickerWrap.classList.toggle('d-none', cardTypeSelect.value !== 'bug');
+            }
+            if (testCasePickerWrap) {
+                testCasePickerWrap.classList.toggle('d-none', cardTypeSelect.value !== 'test_case');
+            }
         }
         form.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
@@ -256,6 +295,64 @@
             cardIdField.value = '';
             submitBtn.textContent = t('Add Card');
             cancelBtn.classList.add('d-none');
+            if (cardTypeSelect) {
+                if (bugPickerWrap) {
+                    bugPickerWrap.classList.toggle('d-none', cardTypeSelect.value !== 'bug');
+                }
+                if (testCasePickerWrap) {
+                    testCasePickerWrap.classList.toggle('d-none', cardTypeSelect.value !== 'test_case');
+                }
+            }
+        });
+    }
+
+    if (cardTypeSelect) {
+        const toggleBugPicker = () => {
+            if (bugPickerWrap) {
+                bugPickerWrap.classList.toggle('d-none', cardTypeSelect.value !== 'bug');
+            }
+            if (testCasePickerWrap) {
+                testCasePickerWrap.classList.toggle('d-none', cardTypeSelect.value !== 'test_case');
+            }
+        };
+        cardTypeSelect.addEventListener('change', toggleBugPicker);
+        toggleBugPicker();
+    }
+
+    if (addColumnBtn) {
+        addColumnBtn.addEventListener('click', () => {
+            if (!columnModal || !columnNameInput) return;
+            columnNameInput.value = '';
+            columnModal.show();
+            setTimeout(() => columnNameInput.focus(), 120);
+        });
+    }
+
+    if (columnCreateSubmit) {
+        columnCreateSubmit.addEventListener('click', async () => {
+            const boardId = addColumnBtn ? addColumnBtn.dataset.boardId : '';
+            const name = columnNameInput ? columnNameInput.value.trim() : '';
+            if (!name) return;
+
+            try {
+                await apiCall({
+                    action: 'create_column',
+                    board_id: boardId,
+                    name
+                });
+                window.location.reload();
+            } catch (error) {
+                alert(error.message || t('Unable to create column'));
+            }
+        });
+    }
+
+    if (columnNameInput && columnCreateSubmit) {
+        columnNameInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                columnCreateSubmit.click();
+            }
         });
     }
 })();

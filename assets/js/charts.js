@@ -1,10 +1,32 @@
 (() => {
+    if (!window.__yjhChartsThemeSyncBound) {
+        window.__yjhChartsThemeSyncBound = true;
+        window.addEventListener('yjh:theme-changed', () => {
+            window.setTimeout(() => window.location.reload(), 40);
+        });
+    }
+
     const t = (value) => (window.uiT ? window.uiT(value) : value);
     const bodyStyles = getComputedStyle(document.body);
     const textColor = bodyStyles.getPropertyValue('--text')?.trim() || '#e2e8f0';
     const gridColor = 'rgba(148, 163, 184, 0.18)';
-    const isDark = document.body.classList.contains('theme-dark');
-    const tickColor = isDark ? 'rgba(226, 232, 240, 0.9)' : textColor;
+    const isDark = document.documentElement.classList.contains('theme-dark') || document.body.classList.contains('theme-dark');
+    const contrastText = isDark ? '#ffffff' : '#0f172a';
+    const tickColor = textColor;
+    const legendColor = textColor;
+    const palette = {
+        opened: '#ef4444',
+        closed: '#3b82f6',
+        inProgress: '#22c55e'
+    };
+    const withProject = (path, params, projectId) => {
+        const query = new URLSearchParams(params || {});
+        if (Number(projectId) > 0) {
+            query.set('project_id', String(projectId));
+        }
+        const qs = query.toString();
+        return qs ? `${path}?${qs}` : path;
+    };
 
     const commonOptions = {
         responsive: true,
@@ -20,18 +42,22 @@
         plugins: {
             legend: {
                 labels: {
-                    color: tickColor,
+                    color: legendColor,
+                    font: {
+                        size: 14,
+                        weight: '700'
+                    },
                     boxWidth: 14,
                     boxHeight: 14,
                     usePointStyle: true,
-                    pointStyle: 'rectRounded',
-                    padding: 14
+                    pointStyle: 'circle',
+                    padding: 18
                 }
             },
             tooltip: {
                 backgroundColor: isDark ? '#0b1220' : '#ffffff',
-                titleColor: textColor,
-                bodyColor: textColor,
+                titleColor: contrastText,
+                bodyColor: contrastText,
                 borderColor: gridColor,
                 borderWidth: 1,
                 padding: 10,
@@ -40,25 +66,96 @@
         }
     };
 
+    if (window.Chart && Chart.defaults) {
+        Chart.defaults.color = textColor;
+        Chart.defaults.borderColor = gridColor;
+    }
+
     const donut = document.getElementById('chartPassFail');
     if (donut) {
         donut.style.cursor = 'pointer';
         const data = JSON.parse(donut.dataset.chart || '{}');
+        const projectId = Number(data.project_id || 0);
+        const pass = Number(data.pass || 0);
+        const fail = Number(data.fail || 0);
+        const inProgress = Number(data.in_progress || 0);
+        const groups = [
+            { label: t('New Bugs'), value: inProgress, result: 'in_progress', color: '#22c55e' },
+            { label: t('In Progress'), value: fail, result: 'fail', color: '#ef4444' },
+            { label: t('Closed'), value: pass, result: 'pass', color: '#3b82f6' }
+        ];
+        const total = groups.reduce((sum, group) => sum + group.value, 0);
+        const ringBorder = isDark ? '#16233a' : '#e2e8f0';
+        const chartValues = total > 0 ? groups.map((group) => group.value) : [1];
+        const chartColors = total > 0 ? groups.map((group) => group.color) : [isDark ? '#334155' : '#cbd5e1'];
+
         const donutChart = new Chart(donut, {
             type: 'doughnut',
             data: {
-                labels: [t('Pass'), t('Fail')],
+                labels: total > 0 ? groups.map((item) => item.label) : [t('No open tasks.')],
                 datasets: [{
-                    data: [data.pass || 0, data.fail || 0],
-                    backgroundColor: ['#22c58b', '#ff4d4f'],
-                    borderColor: isDark ? '#1e293b' : '#ffffff',
-                    borderWidth: 3,
-                    hoverOffset: 8
+                    data: chartValues,
+                    backgroundColor: chartColors,
+                    borderColor: ringBorder,
+                    borderWidth: 2,
+                    hoverOffset: 6
                 }]
             },
             options: {
                 ...commonOptions,
-                cutout: '58%'
+                cutout: '46%',
+                plugins: {
+                    ...commonOptions.plugins,
+                    legend: {
+                        ...commonOptions.plugins.legend,
+                        position: 'bottom',
+                        align: 'center',
+                        labels: {
+                            ...commonOptions.plugins.legend.labels,
+                            boxWidth: 10,
+                            boxHeight: 10,
+                            padding: 10,
+                            generateLabels(chart) {
+                                if (total <= 0) {
+                                    return [{
+                                        text: t('No open tasks.'),
+                                        color: legendColor,
+                                        fontColor: legendColor,
+                                        fillStyle: chartColors[0],
+                                        strokeStyle: chartColors[0],
+                                        lineWidth: 0,
+                                        hidden: false,
+                                        index: 0
+                                    }];
+                                }
+                                const dataset = chart.data.datasets[0];
+                                const bg = dataset.backgroundColor || [];
+                                return groups.map((group, index) => ({
+                                    text: `${group.label}: ${group.value}`,
+                                    color: legendColor,
+                                    fontColor: legendColor,
+                                    fillStyle: bg[index] || group.color,
+                                    strokeStyle: bg[index] || group.color,
+                                    lineWidth: 0,
+                                    hidden: false,
+                                    index
+                                }));
+                            }
+                        }
+                    },
+                    tooltip: {
+                        ...commonOptions.plugins.tooltip,
+                        callbacks: {
+                            label(context) {
+                                if (total <= 0) return t('No open tasks.');
+                                const meta = groups[context.dataIndex] || groups[0];
+                                const value = Number(meta.value || 0);
+                                const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+                                return `${meta.label}: ${value} (${pct}%)`;
+                            }
+                        }
+                    }
+                }
             }
         });
         donut.addEventListener('click', (event) => {
@@ -67,8 +164,10 @@
                 return;
             }
             const index = points[0].index;
-            const result = index === 0 ? 'pass' : 'fail';
-            window.location.href = `/testruns.php?result=${encodeURIComponent(result)}`;
+            const meta = groups[index];
+            const result = meta ? meta.result : '';
+            if (!result) return;
+            window.location.href = withProject('/testruns.php', { result }, projectId);
         });
     }
 
@@ -76,6 +175,7 @@
     if (bar) {
         bar.style.cursor = 'pointer';
         const data = JSON.parse(bar.dataset.chart || '{}');
+        const projectId = Number(data.project_id || 0);
         const barChart = new Chart(bar, {
             type: 'bar',
             data: {
@@ -83,32 +183,32 @@
                 datasets: [{
                     label: t('High Priority Bugs'),
                     data: data.values || [],
-                    backgroundColor: (context) => {
-                        const chart = context.chart;
-                        const { ctx, chartArea } = chart;
-                        if (!chartArea) {
-                            return '#3b82f6';
-                        }
-                        const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-                        gradient.addColorStop(0, '#60a5fa');
-                        gradient.addColorStop(1, '#2563eb');
-                        return gradient;
-                    },
-                    borderRadius: 10,
+                    backgroundColor: palette.closed,
+                    borderRadius: 8,
                     borderSkipped: false,
-                    maxBarThickness: 44
+                    maxBarThickness: 34,
+                    barPercentage: 0.5,
+                    categoryPercentage: 0.62
                 }]
             },
             options: {
                 ...commonOptions,
+                plugins: {
+                    ...commonOptions.plugins,
+                    legend: {
+                        ...commonOptions.plugins.legend,
+                        position: 'top',
+                        align: 'center'
+                    }
+                },
                 scales: {
                     x: {
-                        ticks: { color: tickColor },
+                        ticks: { color: tickColor, font: { size: 12, weight: '600' } },
                         grid: { color: gridColor }
                     },
                     y: {
                         beginAtZero: true,
-                        ticks: { color: tickColor },
+                        ticks: { color: tickColor, precision: 0, stepSize: 1, font: { size: 12, weight: '600' } },
                         grid: { color: gridColor }
                     }
                 }
@@ -123,8 +223,7 @@
             if (!label) {
                 return;
             }
-            const params = new URLSearchParams({ priority_group: 'high', status: label });
-            window.location.href = `/bugs.php?${params.toString()}`;
+            window.location.href = withProject('/bugs.php', { priority_group: 'high', status: label }, projectId);
         });
     }
 
@@ -132,6 +231,7 @@
     if (line) {
         line.style.cursor = 'pointer';
         const data = JSON.parse(line.dataset.chart || '{}');
+        const projectId = Number(data.project_id || 0);
         const lineChart = new Chart(line, {
             type: 'line',
             data: {
@@ -140,27 +240,43 @@
                     {
                         label: t('Opened'),
                         data: data.opened || [],
-                        borderColor: '#ff4d4f',
-                        backgroundColor: 'rgba(255, 77, 79, 0.16)',
-                        pointBackgroundColor: '#ff4d4f',
-                        pointBorderColor: '#ff4d4f',
+                        borderColor: palette.opened,
+                        backgroundColor: (context) => {
+                            const { chart } = context;
+                            const { ctx, chartArea } = chart;
+                            if (!chartArea) return 'rgba(239, 68, 68, 0.14)';
+                            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                            gradient.addColorStop(0, 'rgba(239, 68, 68, 0.24)');
+                            gradient.addColorStop(1, 'rgba(239, 68, 68, 0.04)');
+                            return gradient;
+                        },
+                        pointBackgroundColor: palette.opened,
+                        pointBorderColor: palette.opened,
                         pointRadius: 3,
-                        pointHoverRadius: 5,
-                        tension: 0.35,
-                        borderWidth: 3,
+                        pointHoverRadius: 6,
+                        tension: 0.45,
+                        borderWidth: 2.5,
                         fill: true
                     },
                     {
                         label: t('Closed'),
                         data: data.closed || [],
-                        borderColor: '#22c58b',
-                        backgroundColor: 'rgba(34, 197, 139, 0.14)',
-                        pointBackgroundColor: '#22c58b',
-                        pointBorderColor: '#22c58b',
+                        borderColor: palette.closed,
+                        backgroundColor: (context) => {
+                            const { chart } = context;
+                            const { ctx, chartArea } = chart;
+                            if (!chartArea) return 'rgba(59, 130, 246, 0.12)';
+                            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+                            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.04)');
+                            return gradient;
+                        },
+                        pointBackgroundColor: palette.closed,
+                        pointBorderColor: palette.closed,
                         pointRadius: 3,
-                        pointHoverRadius: 5,
-                        tension: 0.35,
-                        borderWidth: 3,
+                        pointHoverRadius: 6,
+                        tension: 0.45,
+                        borderWidth: 2.5,
                         fill: true
                     }
                 ]
@@ -169,12 +285,12 @@
                 ...commonOptions,
                 scales: {
                     x: {
-                        ticks: { color: tickColor },
+                        ticks: { color: tickColor, font: { size: 13, weight: '600' } },
                         grid: { color: gridColor }
                     },
                     y: {
                         beginAtZero: true,
-                        ticks: { color: tickColor },
+                        ticks: { color: tickColor, font: { size: 13, weight: '600' }, precision: 0 },
                         grid: { color: gridColor }
                     }
                 }
@@ -191,11 +307,14 @@
                 return;
             }
             if (point.datasetIndex === 0) {
-                window.location.href = `/bugs.php?created_date=${encodeURIComponent(date)}`;
+                window.location.href = withProject('/bugs.php', { created_date: date }, projectId);
                 return;
             }
-            window.location.href = `/bugs.php?status=closed&closed_date=${encodeURIComponent(date)}`;
+            window.location.href = withProject('/bugs.php', { status: 'closed', closed_date: date }, projectId);
         });
     }
 })();
+
+
+
 

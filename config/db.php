@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__ . '/../includes/encryption.php';
 
 function db(): PDO
 {
@@ -18,6 +19,9 @@ function db(): PDO
     $pdo->exec('PRAGMA busy_timeout = 5000;');
 
     initialize_schema($pdo);
+    apply_security_migrations($pdo);
+    apply_ai_migrations($pdo);
+    apply_fk_migrations($pdo);
 
     if ($isNew) {
         seed_demo_data($pdo);
@@ -120,7 +124,7 @@ CREATE TABLE IF NOT EXISTS bugs (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME,
     closed_at DATETIME,
-    FOREIGN KEY (project_id) REFERENCES projects(id),
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
     FOREIGN KEY (release_id) REFERENCES releases(id),
     FOREIGN KEY (assignee_id) REFERENCES users(id),
     FOREIGN KEY (reporter_id) REFERENCES users(id),
@@ -515,6 +519,19 @@ CREATE TABLE IF NOT EXISTS notifications (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS translation_cache (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_lang TEXT NOT NULL,
+    target_lang TEXT NOT NULL,
+    text_hash TEXT NOT NULL,
+    source_text TEXT NOT NULL,
+    translated_text TEXT NOT NULL,
+    provider TEXT DEFAULT 'libretranslate',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(source_lang, target_lang, text_hash)
+);
 SQL;
 
     $pdo->exec($schema);
@@ -625,4 +642,258 @@ SQL);
     $pdo->exec("INSERT INTO user_achievements (user_id, achievement_id) VALUES (2, 1), (2, 2), (3, 1)");
 
     $pdo->commit();
+}
+
+function apply_security_migrations(PDO $pdo): void
+{
+    ensure_column($pdo, 'users', 'email_encrypted', 'TEXT');
+    ensure_column($pdo, 'users', 'email_hash', 'TEXT');
+    ensure_column($pdo, 'users', 'twofa_secret_encrypted', 'TEXT');
+    ensure_column($pdo, 'users', 'twofa_enabled', 'INTEGER NOT NULL DEFAULT 0');
+
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS security_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            action TEXT NOT NULL,
+            ip_address TEXT,
+            user_agent TEXT,
+            details TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )'
+    );
+
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS rate_limit_entries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            key TEXT NOT NULL,
+            attempted_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )'
+    );
+
+    $pdo->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_hash ON users(email_hash)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_security_log_action_created ON security_log(action, created_at)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_security_log_user_created ON security_log(user_id, created_at)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_rate_limit_key_time ON rate_limit_entries(key, attempted_at)');
+
+    backfill_encrypted_emails($pdo);
+}
+
+function apply_ai_migrations(PDO $pdo): void
+{
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS ai_cache (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            prompt_hash TEXT UNIQUE NOT NULL,
+            prompt TEXT NOT NULL,
+            response TEXT NOT NULL,
+            model TEXT NOT NULL,
+            tokens_used INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )'
+    );
+
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS ai_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            action_type TEXT NOT NULL,
+            prompt TEXT,
+            response TEXT,
+            tokens_used INTEGER,
+            duration_ms INTEGER,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )'
+    );
+
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS ai_templates (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            template_type TEXT NOT NULL,
+            template_text TEXT NOT NULL,
+            is_public BOOLEAN DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )'
+    );
+
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_ai_cache_hash ON ai_cache(prompt_hash)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_ai_logs_user_created ON ai_logs(user_id, created_at)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_ai_logs_action_created ON ai_logs(action_type, created_at)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_ai_templates_user_type ON ai_templates(user_id, template_type)');
+}
+
+function apply_fk_migrations(PDO $pdo): void
+{
+    repair_legacy_bug_fk_targets($pdo);
+
+    // Normalize legacy schema where bugs.project_id was created without ON DELETE CASCADE.
+    $createSqlStmt = $pdo->query("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'bugs'");
+    $createSql = (string)($createSqlStmt ? $createSqlStmt->fetchColumn() : '');
+    if ($createSql === '' || stripos($createSql, 'FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE') !== false) {
+        return;
+    }
+
+    $pdo->beginTransaction();
+    try {
+        $pdo->exec('PRAGMA foreign_keys = OFF');
+        $pdo->exec(<<<'SQL'
+CREATE TABLE bugs_new (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER NOT NULL,
+    release_id INTEGER,
+    title TEXT NOT NULL,
+    description TEXT,
+    steps_to_reproduce TEXT,
+    expected_result TEXT,
+    actual_result TEXT,
+    environment TEXT,
+    severity TEXT CHECK(severity IN ('blocker','critical','major','minor','trivial')) NOT NULL,
+    priority TEXT CHECK(priority IN ('highest','high','medium','low','lowest')) NOT NULL,
+    status TEXT CHECK(status IN ('new','assigned','in_progress','fixed','verified','closed','reopened')) DEFAULT 'new',
+    assignee_id INTEGER,
+    reporter_id INTEGER NOT NULL,
+    resolution TEXT CHECK(resolution IN ('fixed','duplicate','cannot_reproduce','wontfix','worksforme',NULL)),
+    duplicate_of INTEGER,
+    similarity_score FLOAT,
+    due_date DATE,
+    estimated_time INTEGER,
+    actual_time INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME,
+    closed_at DATETIME,
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+    FOREIGN KEY (release_id) REFERENCES releases(id),
+    FOREIGN KEY (assignee_id) REFERENCES users(id),
+    FOREIGN KEY (reporter_id) REFERENCES users(id),
+    FOREIGN KEY (duplicate_of) REFERENCES bugs_new(id)
+)
+SQL
+        );
+        $pdo->exec(
+            'INSERT INTO bugs_new (
+                id, project_id, release_id, title, description, steps_to_reproduce, expected_result,
+                actual_result, environment, severity, priority, status, assignee_id, reporter_id,
+                resolution, duplicate_of, similarity_score, due_date, estimated_time, actual_time,
+                created_at, updated_at, closed_at
+            )
+            SELECT
+                id, project_id, release_id, title, description, steps_to_reproduce, expected_result,
+                actual_result, environment, severity, priority, status, assignee_id, reporter_id,
+                resolution, duplicate_of, similarity_score, due_date, estimated_time, actual_time,
+                created_at, updated_at, closed_at
+            FROM bugs'
+        );
+        $pdo->exec('DROP TABLE bugs');
+        $pdo->exec('ALTER TABLE bugs_new RENAME TO bugs');
+        $pdo->exec('PRAGMA foreign_keys = ON');
+        $pdo->commit();
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        $pdo->exec('PRAGMA foreign_keys = ON');
+        throw $e;
+    }
+}
+
+function repair_legacy_bug_fk_targets(PDO $pdo): void
+{
+    $stmt = $pdo->query("SELECT name, sql FROM sqlite_master WHERE type = 'table' AND sql LIKE '%bugs_old%'");
+    $tables = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+    if (!$tables) {
+        return;
+    }
+
+    $pdo->beginTransaction();
+    try {
+        $pdo->exec('PRAGMA foreign_keys = OFF');
+        foreach ($tables as $table) {
+            $tableName = (string)($table['name'] ?? '');
+            $sql = (string)($table['sql'] ?? '');
+            if ($tableName === '' || $sql === '') {
+                continue;
+            }
+
+            $tmpName = $tableName . '__fix';
+            $createTmpSql = preg_replace(
+                '/^CREATE TABLE\\s+("?)([A-Za-z0-9_]+)\\1/i',
+                'CREATE TABLE ' . $tmpName,
+                $sql,
+                1
+            );
+            $createTmpSql = str_replace(['"bugs_old"', "'bugs_old'"], 'bugs', (string)$createTmpSql);
+            if (!$createTmpSql) {
+                continue;
+            }
+
+            $pdo->exec($createTmpSql);
+            $pdo->exec("INSERT INTO $tmpName SELECT * FROM $tableName");
+            $pdo->exec("DROP TABLE $tableName");
+            $pdo->exec("ALTER TABLE $tmpName RENAME TO $tableName");
+        }
+        $pdo->exec('PRAGMA foreign_keys = ON');
+        $pdo->commit();
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        $pdo->exec('PRAGMA foreign_keys = ON');
+        throw $e;
+    }
+}
+
+function ensure_column(PDO $pdo, string $table, string $column, string $definition): void
+{
+    $stmt = $pdo->query("PRAGMA table_info($table)");
+    $columns = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+    foreach ($columns as $col) {
+        if (($col['name'] ?? '') === $column) {
+            return;
+        }
+    }
+    $pdo->exec("ALTER TABLE $table ADD COLUMN $column $definition");
+}
+
+function backfill_encrypted_emails(PDO $pdo): void
+{
+    $stmt = $pdo->query('SELECT id, email, email_encrypted, email_hash FROM users');
+    $users = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+    if (!$users) {
+        return;
+    }
+
+    $update = $pdo->prepare(
+        'UPDATE users
+         SET email = :email_marker,
+             email_encrypted = :email_encrypted,
+             email_hash = :email_hash
+         WHERE id = :id'
+    );
+
+    foreach ($users as $user) {
+        $emailEncrypted = (string)($user['email_encrypted'] ?? '');
+        $emailHash = (string)($user['email_hash'] ?? '');
+        $rawEmail = (string)($user['email'] ?? '');
+        $plainEmail = $emailEncrypted !== '' ? decrypt_value($emailEncrypted) : $rawEmail;
+
+        if ($plainEmail === '') {
+            continue;
+        }
+
+        $nextHash = email_hash($plainEmail);
+        $nextEncrypted = $emailEncrypted !== '' ? $emailEncrypted : encrypt_value($plainEmail);
+        $marker = 'enc:' . substr($nextHash, 0, 24);
+
+        if ($rawEmail === $marker && $emailHash === $nextHash && $emailEncrypted !== '') {
+            continue;
+        }
+
+        $update->execute([
+            ':id' => (int)$user['id'],
+            ':email_marker' => $marker,
+            ':email_encrypted' => $nextEncrypted,
+            ':email_hash' => $nextHash,
+        ]);
+    }
 }

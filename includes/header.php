@@ -14,6 +14,7 @@ $returnPath = $_SERVER['REQUEST_URI'] ?? '/index.php';
 $returnPath = is_string($returnPath) && str_starts_with($returnPath, '/') ? $returnPath : '/index.php';
 $langEnHref = '/set-language.php?lang=en&return=' . urlencode($returnPath);
 $langRuHref = '/set-language.php?lang=ru&return=' . urlencode($returnPath);
+$langUaHref = '/set-language.php?lang=ua&return=' . urlencode($returnPath);
 ?>
 <!doctype html>
 <html lang="<?php echo h($language); ?>" class="<?php echo h($themeClass); ?>" data-theme="<?php echo h($themeName); ?>">
@@ -38,7 +39,7 @@ $langRuHref = '/set-language.php?lang=ru&return=' . urlencode($returnPath);
     </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="/assets/css/style.css" rel="stylesheet">
 </head>
 <body data-theme="<?php echo h($themeName); ?>">
 <div class="app-shell">
@@ -55,11 +56,23 @@ $langRuHref = '/set-language.php?lang=ru&return=' . urlencode($returnPath);
             </div>
         </div>
         <div class="d-flex align-items-center gap-3">
-            <button class="btn btn-sm btn-outline-light" id="themeToggle"><i class="fa-solid fa-moon"></i></button>
-            <div class="lang-switcher d-flex align-items-center gap-1">
-                <i class="fa-solid fa-language"></i>
-                <a class="btn btn-sm <?php echo $language === 'en' ? 'btn-light text-dark' : 'btn-outline-light'; ?>" href="<?php echo h($langEnHref); ?>">EN</a>
-                <a class="btn btn-sm <?php echo $language === 'ru' ? 'btn-light text-dark' : 'btn-outline-light'; ?>" href="<?php echo h($langRuHref); ?>">RU</a>
+            <button class="theme-switch" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+                <span class="theme-switch-track">
+                    <i class="fa-solid fa-sun theme-icon-sun"></i>
+                    <i class="fa-solid fa-moon theme-icon-moon"></i>
+                    <span class="theme-switch-knob"></span>
+                </span>
+            </button>
+            <div class="dropdown lang-dropdown">
+                <button class="lang-toggle dropdown-toggle d-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="Change language" title="Change language">
+                    <i class="fa-solid fa-globe"></i>
+                    <span class="lang-toggle-code"><?php echo strtoupper(h($language)); ?></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item <?php echo $language === 'en' ? 'active' : ''; ?>" href="<?php echo h($langEnHref); ?>">English (EN)</a></li>
+                    <li><a class="dropdown-item <?php echo $language === 'ru' ? 'active' : ''; ?>" href="<?php echo h($langRuHref); ?>">Russian (RU)</a></li>
+                    <li><a class="dropdown-item <?php echo $language === 'ua' ? 'active' : ''; ?>" href="<?php echo h($langUaHref); ?>">Ukrainian (UA)</a></li>
+                </ul>
             </div>
             <div class="user-chip">
                 <span><?php echo h($user['username'] ?? ''); ?></span>

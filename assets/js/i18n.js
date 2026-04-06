@@ -1,292 +1,460 @@
 (() => {
     const lang = (document.documentElement.lang || 'en').toLowerCase();
-    const dictionary = {
-        'Dashboard': 'Дашборд',
-        'My Day': 'Мой день',
-        'Projects': 'Проекты',
-        'Bugs': 'Баги',
-        'Test Plans': 'Тест-планы',
-        'Test Runs': 'Тест-раны',
-        'Wiki': 'Вики',
-        'Kanban': 'Канбан',
-        'Calendar': 'Календарь',
-        'Reports': 'Отчеты',
-        'Users': 'Пользователи',
-        'Favorites': 'Избранное',
-        'No favorites yet.': 'Пока нет избранного.',
-        'Search (Ctrl+K)': 'Поиск (Ctrl+K)',
-        'Type to search...': 'Введите для поиска...',
-        'Close': 'Закрыть',
-        'Settings': 'Настройки',
-        'Theme': 'Тема',
-        'Light': 'Светлая',
-        'Dark': 'Темная',
-        'Language': 'Язык',
-        'English': 'Английский',
-        'Russian': 'Русский',
-        'New password': 'Новый пароль',
-        'Leave empty': 'Оставьте пустым',
-        'Save': 'Сохранить',
-        'Login - YJH': 'Вход - YJH',
-        'Sign in': 'Войти',
-        'Email': 'Email',
-        'Password': 'Пароль',
-        'Login': 'Войти',
-        'One platform. One team. One source of truth.': 'Одна платформа. Одна команда. Один источник правды.',
-        'Pass / Fail Rate': 'Доля Pass / Fail',
-        'High Priority Bugs': 'Баги высокого приоритета',
-        'Risk Engine': 'Оценка риска',
-        'Score:': 'Оценка:',
-        'Bug Trends (7 days)': 'Тренд багов (7 дней)',
-        'Low': 'Низкий',
-        'Medium': 'Средний',
-        'High': 'Высокий',
-        'My Bugs': 'Мои баги',
-        'No assigned bugs.': 'Нет назначенных багов.',
-        'My Test Runs': 'Мои тест-раны',
-        'No test runs.': 'Нет тест-ранов.',
-        'Mentions': 'Упоминания',
-        'No mentions.': 'Нет упоминаний.',
-        'Create Project': 'Создать проект',
-        'Project name': 'Название проекта',
-        'Description': 'Описание',
-        'Active': 'Активный',
-        'Archived': 'Архивный',
-        'Name': 'Название',
-        'Status': 'Статус',
-        'Open': 'Открыть',
-        'Project not found': 'Проект не найден',
-        'Back': 'Назад',
-        'Project details': 'Детали проекта',
-        'Releases': 'Релизы',
-        'Create Release': 'Создать релиз',
-        'Release name': 'Название релиза',
-        'Planned': 'Запланирован',
-        'In Progress': 'В работе',
-        'Released': 'Выпущен',
-        'Cancelled': 'Отменен',
-        'Release': 'Релиз',
-        'Project': 'Проект',
-        'Date': 'Дата',
-        'Lead Time': 'Время выполнения',
-        'Reopen Rate': 'Доля переоткрытий',
-        'Velocity (7d)': 'Скорость (7д)',
-        'Buggiest Modules': 'Самые проблемные модули',
-        'Team Calendar': 'Календарь команды',
-        'Add absence': 'Добавить отсутствие',
-        'Vacation': 'Отпуск',
-        'Sick leave': 'Больничный',
-        'Day off': 'Выходной',
-        'Conference': 'Конференция',
-        'Other': 'Другое',
-        'Reason': 'Причина',
-        'User': 'Пользователь',
-        'Type': 'Тип',
-        'From': 'С',
-        'To': 'По',
-        'Card title': 'Название карточки',
-        'labels,comma': 'метки,через запятую',
-        'Assignee': 'Исполнитель',
-        'Add Card': 'Добавить карточку',
-        'No boards configured.': 'Доски не настроены.',
-        'Create Bug': 'Создать баг',
-        'None': 'Нет',
-        'Back to list': 'Назад к списку',
-        'Possible duplicates:': 'Возможные дубликаты:',
-        'Title': 'Заголовок',
-        'Severity': 'Серьезность',
-        'Priority': 'Приоритет',
-        'Due date': 'Срок',
-        'Steps to reproduce': 'Шаги воспроизведения',
-        'Expected result': 'Ожидаемый результат',
-        'Actual result': 'Фактический результат',
-        'Environment': 'Окружение',
-        'Estimated time (h)': 'Оценка времени (ч)',
-        'Actual time (h)': 'Фактическое время (ч)',
-        'Comments': 'Комментарии',
-        'Add a comment': 'Добавить комментарий',
-        'Post': 'Отправить',
-        'All projects': 'Все проекты',
-        'Apply': 'Применить',
-        'Save Filter': 'Сохранить фильтр',
-        'Saved filters:': 'Сохраненные фильтры:',
-        'ID': 'ID',
-        'Filter name': 'Имя фильтра',
-        'Create Plan': 'Создать план',
-        'Plan name': 'Название плана',
-        'Draft': 'Черновик',
-        'Completed': 'Завершен',
-        'Test plan not found': 'Тест-план не найден',
-        'Create Suite': 'Создать набор',
-        'Suite name': 'Название набора',
-        'No parent': 'Без родителя',
-        'Suites': 'Наборы',
-        'Test Cases': 'Тест-кейсы',
-        'Suite': 'Набор',
-        'Create Test Case': 'Создать тест-кейс',
-        'Create Test Run': 'Создать тест-ран',
-        'Run name': 'Название рана',
-        'Unassigned': 'Не назначен',
-        'Execute': 'Выполнить',
-        'Test run not found': 'Тест-ран не найден',
-        'Case': 'Кейс',
-        'Notes': 'Заметки',
-        'Create bug': 'Создать баг',
-        'Create Test Case': 'Создать тест-кейс',
-        'Test Case #': 'Тест-кейс #',
-        'Suite': 'Набор',
-        'Preconditions': 'Предусловия',
-        'Automation': 'Автоматизация',
-        'Estimated time (min)': 'Оценка времени (мин)',
-        'Steps (one per line)': 'Шаги (по одному в строке)',
-        'Expected (one per line)': 'Ожидаемый результат (по одному в строке)',
-        'Checklist (one per line)': 'Чеклист (по одному в строке)',
-        'Wiki': 'Вики',
-        'Create Page': 'Создать страницу',
-        'slug': 'слаг',
-        'Markdown': 'Markdown',
-        'Slug': 'Слаг',
-        'Page not found': 'Страница не найдена',
-        'Edit Page': 'Редактировать страницу',
-        'Version Compare': 'Сравнение версий',
-        'Current': 'Текущая',
-        'Compare': 'Сравнить',
-        'Left': 'Левая',
-        'Right': 'Правая',
-        'Create User': 'Создать пользователя',
-        'Username': 'Логин',
-        'Role': 'Роль',
-        'Admin': 'Администратор',
-        'Developer': 'Разработчик',
-        'Viewer': 'Наблюдатель',
-        'QA': 'Тестировщик',
-        'Pass': 'Пройдено',
-        'Fail': 'Провалено',
-        'Opened': 'Открыто',
-        'Closed': 'Закрыто',
-        'Welcome back': 'С возвращением',
-        'Invalid credentials': 'Неверные учетные данные',
-        'Settings updated': 'Настройки обновлены',
-        'Project created': 'Проект создан',
-        'Project updated': 'Проект обновлен',
-        'Release created': 'Релиз создан',
-        'Availability added': 'Отсутствие добавлено',
-        'Card created': 'Карточка создана',
-        'Comment added': 'Комментарий добавлен',
-        'Bug updated': 'Баг обновлен',
-        'Bug created': 'Баг создан',
-        'Test plan created': 'Тест-план создан',
-        'Suite created': 'Набор создан',
-        'Test case updated': 'Тест-кейс обновлен',
-        'Test case created': 'Тест-кейс создан',
-        'Test run created': 'Тест-ран создан',
-        'Execution updated': 'Выполнение обновлено',
-        'Page created': 'Страница создана',
-        'Page updated': 'Страница обновлена',
-        'User created': 'Пользователь создан',
-        'new': 'новый',
-        'assigned': 'назначен',
-        'in_progress': 'в работе',
-        'fixed': 'исправлен',
-        'verified': 'проверен',
-        'closed': 'закрыт',
-        'reopened': 'переоткрыт',
-        'highest': 'самый высокий',
-        'high': 'высокий',
-        'medium': 'средний',
-        'low': 'низкий',
-        'lowest': 'самый низкий',
-        'blocker': 'блокирующий',
-        'critical': 'критический',
-        'major': 'серьезный',
-        'minor': 'незначительный',
-        'trivial': 'тривиальный',
-        'functional': 'функциональный',
-        'ui': 'интерфейсный',
-        'performance': 'производительность',
-        'security': 'безопасность',
-        'integration': 'интеграционный',
-        'manual': 'ручной',
-        'automated': 'автоматизированный',
-        'partially': 'частично',
-        'pass': 'пройден',
-        'fail': 'провален',
-        'blocked': 'заблокирован',
-        'not_tested': 'не протестирован',
-        'skipped': 'пропущен',
-        'planned': 'запланирован',
-        'released': 'выпущен',
-        'cancelled': 'отменен',
-        'vacation': 'отпуск',
-        'sick_leave': 'больничный',
-        'day_off': 'выходной',
-        'conference': 'конференция',
-        'other': 'другое',
-        'draft': 'черновик',
-        'active': 'активный',
-        'completed': 'завершен',
-        'admin': 'администратор',
-        'qa': 'тестировщик',
-        'developer': 'разработчик',
-        'viewer': 'наблюдатель',
-        'My Tasks': 'Мои задачи',
-        'No open tasks.': 'Нет открытых задач.',
-        'Quick Actions': 'Быстрые действия',
-        'Create Test Plan': 'Создать тест-план',
-        'Create Wiki Page': 'Создать страницу Wiki',
-        'Test Runs Today': 'Тест-раны сегодня',
-        'Runs completed': 'Завершено ранов',
-        'Pass today:': 'Pass сегодня:',
-        'Fail today:': 'Fail сегодня:',
-        'Bug Trends (14 days)': 'Тренд багов (14 дней)',
-        'Bug Trends (30 days)': 'Тренд багов (30 дней)',
-        '+ Bug': '+ Баг',
-        '+ Test Case': '+ Тест-кейс',
-        '+ Test Run': '+ Тест-ран',
-        '+ Project': '+ Проект',
-        'Filter: runs with': 'Фильтр: раны с',
-        'results': 'результатами',
-        'clear': 'сбросить',
-        'Save Card': 'Сохранить карточку',
-        'Cancel edit': 'Отменить редактирование',
-        'Edit card': 'Редактировать карточку',
-        'Delete card': 'Удалить карточку',
-        'Edit column': 'Редактировать столбец',
-        'Delete column': 'Удалить столбец',
-        'Delete card?': 'Удалить карточку?',
-        'Delete column?': 'Удалить столбец?',
-        'Unable to delete card': 'Не удалось удалить карточку',
-        'Unable to update column': 'Не удалось обновить столбец',
-        'Column is not empty': 'Столбец не пустой',
-        'Invalid CSRF token': 'Неверный CSRF токен'
+    if (!['ru', 'ua'].includes(lang)) {
+        window.uiT = (v) => v;
+        return;
+    }
+
+    const ru = {
+        'Dashboard': '\u0414\u0430\u0448\u0431\u043e\u0440\u0434',
+        'My Day': '\u041c\u043e\u0439 \u0434\u0435\u043d\u044c',
+        'Projects': '\u041f\u0440\u043e\u0435\u043a\u0442\u044b',
+        'Bugs': '\u0411\u0430\u0433\u0438',
+        'Test Plans': '\u0422\u0435\u0441\u0442-\u043f\u043b\u0430\u043d\u044b',
+        'Test Runs': '\u0422\u0435\u0441\u0442-\u0440\u0430\u043d\u044b',
+        'Wiki': '\u0412\u0438\u043a\u0438',
+        'Kanban': '\u041a\u0430\u043d\u0431\u0430\u043d',
+        'Calendar': '\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c',
+        'Reports': '\u041e\u0442\u0447\u0435\u0442\u044b',
+        'Users': '\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0438',
+        'Favorites': '\u0418\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0435',
+        'No favorites yet.': '\u041f\u043e\u043a\u0430 \u043d\u0435\u0442 \u0438\u0437\u0431\u0440\u0430\u043d\u043d\u043e\u0433\u043e.',
+        'Search (Ctrl+K)': '\u041f\u043e\u0438\u0441\u043a (Ctrl+K)',
+        'Type to search...': '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0434\u043b\u044f \u043f\u043e\u0438\u0441\u043a\u0430...',
+        'Settings': '\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438',
+        'Language': '\u042f\u0437\u044b\u043a',
+        'English': '\u0410\u043d\u0433\u043b\u0438\u0439\u0441\u043a\u0438\u0439',
+        'Russian': '\u0420\u0443\u0441\u0441\u043a\u0438\u0439',
+        'Ukrainian': '\u0423\u043a\u0440\u0430\u0438\u043d\u0441\u043a\u0438\u0439',
+        'Save': '\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c',
+        'Cancel': '\u041e\u0442\u043c\u0435\u043d\u0430',
+        'Back': '\u041d\u0430\u0437\u0430\u0434',
+        'Open': '\u041e\u0442\u043a\u0440\u044b\u0442\u044c',
+        'Edit': '\u0420\u0435\u0434\u0430\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c',
+        'Delete': '\u0423\u0434\u0430\u043b\u0438\u0442\u044c',
+        'Actions': '\u0414\u0435\u0439\u0441\u0442\u0432\u0438\u044f',
+        'Name': '\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435',
+        'Description': '\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435',
+        'Status': '\u0421\u0442\u0430\u0442\u0443\u0441',
+        'Project': '\u041f\u0440\u043e\u0435\u043a\u0442',
+        'User': '\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c',
+        'Role': '\u0420\u043e\u043b\u044c',
+        'Username': '\u041b\u043e\u0433\u0438\u043d',
+        'Password': '\u041f\u0430\u0440\u043e\u043b\u044c',
+        'Create User': '\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f',
+        'Update User': '\u041e\u0431\u043d\u043e\u0432\u0438\u0442\u044c \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f',
+        'Users Base': '\u0411\u0430\u0437\u0430 \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439',
+        'New User': '\u041d\u043e\u0432\u044b\u0439 \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c',
+        'Create Project': '\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043f\u0440\u043e\u0435\u043a\u0442',
+        'Update Project': '\u041e\u0431\u043d\u043e\u0432\u0438\u0442\u044c \u043f\u0440\u043e\u0435\u043a\u0442',
+        'Project name': '\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0435\u043a\u0442\u0430',
+        'Manage accounts, roles and access': '\u0423\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u0443\u0447\u0435\u0442\u043d\u044b\u043c\u0438 \u0437\u0430\u043f\u0438\u0441\u044f\u043c\u0438, \u0440\u043e\u043b\u044f\u043c\u0438 \u0438 \u0434\u043e\u0441\u0442\u0443\u043f\u043e\u043c',
+        'Manage projects and statuses': '\u0423\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u043f\u0440\u043e\u0435\u043a\u0442\u0430\u043c\u0438 \u0438 \u0441\u0442\u0430\u0442\u0443\u0441\u0430\u043c\u0438',
+        'Delete project?': '\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u043f\u0440\u043e\u0435\u043a\u0442?',
+        'Delete user?': '\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f?',
+        'Project created': '\u041f\u0440\u043e\u0435\u043a\u0442 \u0441\u043e\u0437\u0434\u0430\u043d',
+        'Project updated': '\u041f\u0440\u043e\u0435\u043a\u0442 \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d',
+        'Project deleted': '\u041f\u0440\u043e\u0435\u043a\u0442 \u0443\u0434\u0430\u043b\u0435\u043d',
+        'Cannot delete project: linked records exist': '\u041d\u0435\u043b\u044c\u0437\u044f \u0443\u0434\u0430\u043b\u0438\u0442\u044c \u043f\u0440\u043e\u0435\u043a\u0442: \u0435\u0441\u0442\u044c \u0441\u0432\u044f\u0437\u0430\u043d\u043d\u044b\u0435 \u0437\u0430\u043f\u0438\u0441\u0438',
+        'User created': '\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c \u0441\u043e\u0437\u0434\u0430\u043d',
+        'User updated': '\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c \u043e\u0431\u043d\u043e\u0432\u043b\u0435\u043d',
+        'User deleted': '\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c \u0443\u0434\u0430\u043b\u0435\u043d',
+        'You cannot delete your own account': '\u041d\u0435\u043b\u044c\u0437\u044f \u0443\u0434\u0430\u043b\u0438\u0442\u044c \u0441\u0432\u043e\u044e \u0443\u0447\u0435\u0442\u043d\u0443\u044e \u0437\u0430\u043f\u0438\u0441\u044c',
+        'Cannot delete user: linked records exist': '\u041d\u0435\u043b\u044c\u0437\u044f \u0443\u0434\u0430\u043b\u0438\u0442\u044c \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f: \u0435\u0441\u0442\u044c \u0441\u0432\u044f\u0437\u0430\u043d\u043d\u044b\u0435 \u0437\u0430\u043f\u0438\u0441\u0438',
+        'Screenshots': '\u0421\u043a\u0440\u0438\u043d\u0448\u043e\u0442\u044b',
+        'Upload screenshots': '\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442\u044b',
+        'Comments': '\u041a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0438',
+        'Add a comment': '\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u043a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0439',
+        'Post': '\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c',
+        'Possible duplicates:': '\u0412\u043e\u0437\u043c\u043e\u0436\u043d\u044b\u0435 \u0434\u0443\u0431\u043b\u0438\u043a\u0430\u0442\u044b:',
+        'Back to list': '\u041d\u0430\u0437\u0430\u0434 \u043a \u0441\u043f\u0438\u0441\u043a\u0443'
+        ,'Toggle theme': '\u041f\u0435\u0440\u0435\u043a\u043b\u044e\u0447\u0438\u0442\u044c \u0442\u0435\u043c\u0443'
+        ,'Change language': '\u0421\u043c\u0435\u043d\u0438\u0442\u044c \u044f\u0437\u044b\u043a'
+        ,'English (EN)': '\u0410\u043d\u0433\u043b\u0438\u0439\u0441\u043a\u0438\u0439 (EN)'
+        ,'Russian (RU)': '\u0420\u0443\u0441\u0441\u043a\u0438\u0439 (RU)'
+        ,'Ukrainian (UA)': '\u0423\u043a\u0440\u0430\u0438\u043d\u0441\u043a\u0438\u0439 (UA)'
+        ,'Add column': '\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u0442\u043e\u043b\u0431\u0435\u0446'
+        ,'Column name': '\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0441\u0442\u043e\u043b\u0431\u0446\u0430'
+        ,'Create column': '\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0441\u0442\u043e\u043b\u0431\u0435\u0446'
+        ,'Create': '\u0421\u043e\u0437\u0434\u0430\u0442\u044c'
+        ,'Execution Overview': '\u041e\u0431\u0437\u043e\u0440 \u0432\u044b\u043f\u043e\u043b\u043d\u0435\u043d\u0438\u0439'
+        ,'Quick Actions': '\u0411\u044b\u0441\u0442\u0440\u044b\u0435 \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044f'
+        ,'My Tasks': '\u041c\u043e\u0438 \u0437\u0430\u0434\u0430\u0447\u0438'
+        ,'No open tasks.': '\u041d\u0435\u0442 \u043e\u0442\u043a\u0440\u044b\u0442\u044b\u0445 \u0437\u0430\u0434\u0430\u0447.'
+        ,'Create Wiki Page': '\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0443 \u0432\u0438\u043a\u0438'
+        ,'Test Runs Today': '\u0422\u0435\u0441\u0442-\u0440\u0430\u043d\u044b \u0441\u0435\u0433\u043e\u0434\u043d\u044f'
+        ,'Runs completed': '\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e \u0440\u0430\u043d\u043e\u0432'
+        ,'Pass today:': 'Pass \u0441\u0435\u0433\u043e\u0434\u043d\u044f:'
+        ,'Fail today:': 'Fail \u0441\u0435\u0433\u043e\u0434\u043d\u044f:'
+        ,'In Progress': '\u0412 \u0440\u0430\u0431\u043e\u0442\u0435'
+        ,'Edit column': '\u0418\u0437\u043c\u0435\u043d\u0438\u0442\u044c \u0441\u0442\u043e\u043b\u0431\u0435\u0446'
+        ,'Delete column': '\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0441\u0442\u043e\u043b\u0431\u0435\u0446'
+        ,'Edit card': '\u0418\u0437\u043c\u0435\u043d\u0438\u0442\u044c \u043a\u0430\u0440\u0442\u043e\u0447\u043a\u0443'
+        ,'Delete card': '\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u043a\u0430\u0440\u0442\u043e\u0447\u043a\u0443'
+        ,'Save Card': '\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u043a\u0430\u0440\u0442\u043e\u0447\u043a\u0443'
+        ,'Delete card?': '\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u043a\u0430\u0440\u0442\u043e\u0447\u043a\u0443?'
+        ,'Delete column?': '\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0441\u0442\u043e\u043b\u0431\u0435\u0446?'
+        ,'Unable to delete card': '\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0443\u0434\u0430\u043b\u0438\u0442\u044c \u043a\u0430\u0440\u0442\u043e\u0447\u043a\u0443'
+        ,'Unable to update column': '\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u043e\u0431\u043d\u043e\u0432\u0438\u0442\u044c \u0441\u0442\u043e\u043b\u0431\u0435\u0446'
+        ,'Unable to create column': '\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0441\u043e\u0437\u0434\u0430\u0442\u044c \u0441\u0442\u043e\u043b\u0431\u0435\u0446'
+        ,'Column is not empty': '\u0421\u0442\u043e\u043b\u0431\u0435\u0446 \u043d\u0435 \u043f\u0443\u0441\u0442'
+        ,'Request failed': '\u0417\u0430\u043f\u0440\u043e\u0441 \u043d\u0435 \u0432\u044b\u043f\u043e\u043b\u043d\u0435\u043d'
+        ,'No boards configured.': '\u0414\u043e\u0441\u043a\u0438 \u043d\u0435 \u043d\u0430\u0441\u0442\u0440\u043e\u0435\u043d\u044b.'
+        ,'Two-Factor Verification': '\u0414\u0432\u0443\u0445\u0444\u0430\u043a\u0442\u043e\u0440\u043d\u0430\u044f \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0430'
+        ,'Enter the 6-digit code from Google Authenticator.': '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 6-\u0437\u043d\u0430\u0447\u043d\u044b\u0439 \u043a\u043e\u0434 \u0438\u0437 Google Authenticator.'
+        ,'Authentication code': '\u041a\u043e\u0434 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u044f'
+        ,'Verify': '\u041f\u0440\u043e\u0432\u0435\u0440\u0438\u0442\u044c'
+        ,'Cancel login': '\u041e\u0442\u043c\u0435\u043d\u0438\u0442\u044c \u0432\u0445\u043e\u0434'
+        ,'2FA Setup': '\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430 2FA'
+        ,'Enable Google Authenticator based 2FA for your account.': '\u0412\u043a\u043b\u044e\u0447\u0438\u0442\u0435 2FA \u0447\u0435\u0440\u0435\u0437 Google Authenticator \u0434\u043b\u044f \u0441\u0432\u043e\u0435\u0439 \u0443\u0447\u0435\u0442\u043d\u043e\u0439 \u0437\u0430\u043f\u0438\u0441\u0438.'
+        ,'Start setup': '\u041d\u0430\u0447\u0430\u0442\u044c \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0443'
+        ,'Step 1: Add this secret to Google Authenticator:': '\u0428\u0430\u0433 1: \u0414\u043e\u0431\u0430\u0432\u044c\u0442\u0435 \u044d\u0442\u043e\u0442 \u0441\u0435\u043a\u0440\u0435\u0442 \u0432 Google Authenticator:'
+        ,'Alternative URI:': '\u0410\u043b\u044c\u0442\u0435\u0440\u043d\u0430\u0442\u0438\u0432\u043d\u044b\u0439 URI:'
+        ,'Enable 2FA': '\u0412\u043a\u043b\u044e\u0447\u0438\u0442\u044c 2FA'
+        ,'Reset secret': '\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c \u0441\u0435\u043a\u0440\u0435\u0442'
+        ,'2FA is enabled for your account.': '2FA \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u0430 \u0434\u043b\u044f \u0432\u0430\u0448\u0435\u0439 \u0443\u0447\u0435\u0442\u043d\u043e\u0439 \u0437\u0430\u043f\u0438\u0441\u0438.'
+        ,'Disable 2FA': '\u041e\u0442\u043a\u043b\u044e\u0447\u0438\u0442\u044c 2FA'
+        ,'Disable 2FA?': '\u041e\u0442\u043a\u043b\u044e\u0447\u0438\u0442\u044c 2FA?'
+        ,'Too many login attempts. Try again in 15 minutes.': '\u0421\u043b\u0438\u0448\u043a\u043e\u043c \u043c\u043d\u043e\u0433\u043e \u043f\u043e\u043f\u044b\u0442\u043e\u043a \u0432\u0445\u043e\u0434\u0430. \u041f\u043e\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u0447\u0435\u0440\u0435\u0437 15 \u043c\u0438\u043d\u0443\u0442.'
+        ,'Too many invalid 2FA attempts. Try again later.': '\u0421\u043b\u0438\u0448\u043a\u043e\u043c \u043c\u043d\u043e\u0433\u043e \u043d\u0435\u0432\u0435\u0440\u043d\u044b\u0445 \u043f\u043e\u043f\u044b\u0442\u043e\u043a 2FA. \u041f\u043e\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u043f\u043e\u0437\u0436\u0435.'
+        ,'Invalid authentication code': '\u041d\u0435\u0432\u0435\u0440\u043d\u044b\u0439 \u043a\u043e\u0434 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u044f'
+        ,'2FA session expired. Login again.': '\u0421\u0435\u0441\u0441\u0438\u044f 2FA \u0438\u0441\u0442\u0435\u043a\u043b\u0430. \u0412\u043e\u0439\u0434\u0438\u0442\u0435 \u0441\u043d\u043e\u0432\u0430.'
+        ,'2FA setup started. Scan secret and confirm code.': '\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0430 2FA \u043d\u0430\u0447\u0430\u0442\u0430. \u041e\u0442\u0441\u043a\u0430\u043d\u0438\u0440\u0443\u0439\u0442\u0435 \u0441\u0435\u043a\u0440\u0435\u0442 \u0438 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u0435 \u043a\u043e\u0434.'
+        ,'Invalid code. Try again.': '\u041d\u0435\u0432\u0435\u0440\u043d\u044b\u0439 \u043a\u043e\u0434. \u041f\u043e\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u0435\u0449\u0435 \u0440\u0430\u0437.'
+        ,'2FA enabled': '2FA \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u0430'
+        ,'2FA disabled': '2FA \u043e\u0442\u043a\u043b\u044e\u0447\u0435\u043d\u0430'
+        ,'Filter: runs with': '\u0424\u0438\u043b\u044c\u0442\u0440: \u0440\u0430\u043d\u044b \u0441'
+        ,'results': '\u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0430\u043c\u0438'
+        ,'clear': '\u043e\u0447\u0438\u0441\u0442\u0438\u0442\u044c'
+        ,'Login - YJH': '\u0412\u0445\u043e\u0434 - YJH'
+        ,'Sign in': '\u0412\u043e\u0439\u0442\u0438'
+        ,'Login': '\u0412\u043e\u0439\u0442\u0438'
+        ,'Email': 'Email'
+        ,'Theme': '\u0422\u0435\u043c\u0430'
+        ,'Light': '\u0421\u0432\u0435\u0442\u043b\u0430\u044f'
+        ,'Dark': '\u0422\u0435\u043c\u043d\u0430\u044f'
+        ,'New password': '\u041d\u043e\u0432\u044b\u0439 \u043f\u0430\u0440\u043e\u043b\u044c'
+        ,'Leave empty': '\u041e\u0441\u0442\u0430\u0432\u044c\u0442\u0435 \u043f\u0443\u0441\u0442\u044b\u043c'
+        ,'Team Calendar': '\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440\u044c \u043a\u043e\u043c\u0430\u043d\u0434\u044b'
+        ,'Add absence': '\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u043e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0438\u0435'
+        ,'Vacation': '\u041e\u0442\u043f\u0443\u0441\u043a'
+        ,'Sick leave': '\u0411\u043e\u043b\u044c\u043d\u0438\u0447\u043d\u044b\u0439'
+        ,'Day off': '\u0412\u044b\u0445\u043e\u0434\u043d\u043e\u0439'
+        ,'Conference': '\u041a\u043e\u043d\u0444\u0435\u0440\u0435\u043d\u0446\u0438\u044f'
+        ,'Other': '\u0414\u0440\u0443\u0433\u043e\u0435'
+        ,'Reason': '\u041f\u0440\u0438\u0447\u0438\u043d\u0430'
+        ,'Type': '\u0422\u0438\u043f'
+        ,'From': '\u0421'
+        ,'To': '\u041f\u043e'
+        ,'Release': '\u0420\u0435\u043b\u0438\u0437'
+        ,'Planned': '\u0417\u0430\u043f\u043b\u0430\u043d\u0438\u0440\u043e\u0432\u0430\u043d'
+        ,'Released': '\u0412\u044b\u043f\u0443\u0449\u0435\u043d'
+        ,'Cancelled': '\u041e\u0442\u043c\u0435\u043d\u0435\u043d'
+        ,'Date': '\u0414\u0430\u0442\u0430'
+        ,'Create Plan': '\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043f\u043b\u0430\u043d'
+        ,'Plan name': '\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u043f\u043b\u0430\u043d\u0430'
+        ,'Draft': '\u0427\u0435\u0440\u043d\u043e\u0432\u0438\u043a'
+        ,'Active': '\u0410\u043a\u0442\u0438\u0432\u043d\u044b\u0439'
+        ,'Completed': '\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043d'
+        ,'Create Suite': '\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u043d\u0430\u0431\u043e\u0440'
+        ,'Suite name': '\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u043d\u0430\u0431\u043e\u0440\u0430'
+        ,'No parent': '\u0411\u0435\u0437 \u0440\u043e\u0434\u0438\u0442\u0435\u043b\u044f'
+        ,'Suites': '\u041d\u0430\u0431\u043e\u0440\u044b'
+        ,'Create Test Run': '\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0442\u0435\u0441\u0442-\u0440\u0430\u043d'
+        ,'Run name': '\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0440\u0430\u043d\u0430'
+        ,'Unassigned': '\u041d\u0435 \u043d\u0430\u0437\u043d\u0430\u0447\u0435\u043d'
+        ,'Execute': '\u0412\u044b\u043f\u043e\u043b\u043d\u0438\u0442\u044c'
+        ,'Case': '\u041a\u0435\u0439\u0441'
+        ,'Notes': '\u0417\u0430\u043c\u0435\u0442\u043a\u0438'
+        ,'Create bug': '\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0431\u0430\u0433'
+        ,'Filter name': '\u0418\u043c\u044f \u0444\u0438\u043b\u044c\u0442\u0440\u0430'
+        ,'Create Test Case': '\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0442\u0435\u0441\u0442-\u043a\u0435\u0439\u0441'
+        ,'Create Test Plan': '\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0442\u0435\u0441\u0442-\u043f\u043b\u0430\u043d'
+        ,'One platform. One team. One source of truth.': '\u041e\u0434\u043d\u0430 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0430. \u041e\u0434\u043d\u0430 \u043a\u043e\u043c\u0430\u043d\u0434\u0430. \u0415\u0434\u0438\u043d\u044b\u0439 \u0438\u0441\u0442\u043e\u0447\u043d\u0438\u043a \u043f\u0440\u0430\u0432\u0434\u044b.'
+        ,'Score:': '\u041e\u0446\u0435\u043d\u043a\u0430:'
+        ,'Pass': 'Pass'
+        ,'Fail': 'Fail'
+        ,'Opened': '\u041e\u0442\u043a\u0440\u044b\u0442\u043e'
+        ,'Closed': '\u0417\u0430\u043a\u0440\u044b\u0442\u043e'
+        ,'New Bugs': '\u041d\u043e\u0432\u044b\u0435 \u0431\u0430\u0433\u0438'
+        ,'High Priority Bugs': '\u0411\u0430\u0433\u0438 \u0432\u044b\u0441\u043e\u043a\u043e\u0433\u043e \u043f\u0440\u0438\u043e\u0440\u0438\u0442\u0435\u0442\u0430'
+        ,'Add Card': '\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u043a\u0430\u0440\u0442\u043e\u0447\u043a\u0443'
+        ,'Cancel edit': '\u041e\u0442\u043c\u0435\u043d\u0438\u0442\u044c \u0440\u0435\u0434\u0430\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0435'
+        ,'ID': 'ID'
+        ,'Title': '\u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a'
+        ,'Assignee': '\u0418\u0441\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c'
+        ,'All projects': '\u0412\u0441\u0435 \u043f\u0440\u043e\u0435\u043a\u0442\u044b'
+        ,'Apply': '\u041f\u0440\u0438\u043c\u0435\u043d\u0438\u0442\u044c'
+        ,'Save Filter': '\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u0444\u0438\u043b\u044c\u0442\u0440'
+        ,'Saved filters:': '\u0421\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u043d\u044b\u0435 \u0444\u0438\u043b\u044c\u0442\u0440\u044b:'
+        ,'Runs completed': '\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e \u0440\u0430\u043d\u043e\u0432'
+        ,'Test run not found': '\u0422\u0435\u0441\u0442-\u0440\u0430\u043d \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d'
+        ,'Test plan not found': '\u0422\u0435\u0441\u0442-\u043f\u043b\u0430\u043d \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d'
+        ,'Project not found': '\u041f\u0440\u043e\u0435\u043a\u0442 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d'
+        ,'Page not found': '\u0421\u0442\u0440\u0430\u043d\u0438\u0446\u0430 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u0430'
+        ,'Show risk drivers': '\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c \u0434\u0440\u0430\u0439\u0432\u0435\u0440\u044b \u0440\u0438\u0441\u043a\u0430'
+        ,'Blocker bugs:': '\u0411\u043b\u043e\u043a\u0438\u0440\u0443\u044e\u0449\u0438\u0435 \u0431\u0430\u0433\u0438:'
+        ,'Critical bugs:': '\u041a\u0440\u0438\u0442\u0438\u0447\u0435\u0441\u043a\u0438\u0435 \u0431\u0430\u0433\u0438:'
+        ,'High priority bugs:': '\u0411\u0430\u0433\u0438 \u0432\u044b\u0441\u043e\u043a\u043e\u0433\u043e \u043f\u0440\u0438\u043e\u0440\u0438\u0442\u0435\u0442\u0430:'
+        ,'Pass rate:': '\u041f\u0440\u043e\u0446\u0435\u043d\u0442 Pass:'
+        ,'Open risky bugs': '\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0440\u0438\u0441\u043a\u043e\u0432\u044b\u0435 \u0431\u0430\u0433\u0438'
+        ,'Project Scope': '\u041e\u0445\u0432\u0430\u0442 \u043f\u0440\u043e\u0435\u043a\u0442\u0430'
+        ,'Selected:': '\u0412\u044b\u0431\u0440\u0430\u043d\u043e:'
+        ,'Selected: All projects': '\u0412\u044b\u0431\u0440\u0430\u043d\u043e: \u0412\u0441\u0435 \u043f\u0440\u043e\u0435\u043a\u0442\u044b'
+        ,'Documentation': '\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430\u0446\u0438\u044f'
+        ,'Test plans': '\u0422\u0435\u0441\u0442-\u043f\u043b\u0430\u043d\u044b'
+        ,'Test cases': '\u0422\u0435\u0441\u0442-\u043a\u0435\u0439\u0441\u044b'
+        ,'No plans available': '\u041d\u0435\u0442 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b\u0445 \u043f\u043b\u0430\u043d\u043e\u0432'
+        ,'Select a test plan before creating a run': '\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0442\u0435\u0441\u0442-\u043f\u043b\u0430\u043d \u043f\u0435\u0440\u0435\u0434 \u0441\u043e\u0437\u0434\u0430\u043d\u0438\u0435\u043c \u0440\u0430\u043d\u0430'
+        ,'Risk Drivers': '\u0414\u0440\u0430\u0439\u0432\u0435\u0440\u044b \u0440\u0438\u0441\u043a\u0430'
+        ,'Blockers': '\u0411\u043b\u043e\u043a\u0435\u0440\u044b'
+        ,'Critical': '\u041a\u0440\u0438\u0442\u0438\u0447\u0435\u0441\u043a\u0438\u0435'
+        ,'High Priority': '\u0412\u044b\u0441\u043e\u043a\u0438\u0439 \u043f\u0440\u0438\u043e\u0440\u0438\u0442\u0435\u0442'
+        ,'Prev': '\u041d\u0430\u0437\u0430\u0434'
+        ,'Next': '\u0414\u0430\u043b\u0435\u0435'
+        ,'Open original': '\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u043e\u0440\u0438\u0433\u0438\u043d\u0430\u043b'
+        ,'Click, drag, or paste screenshots': '\u041a\u043b\u0438\u043a, drag&drop \u0438\u043b\u0438 \u0432\u0441\u0442\u0430\u0432\u043a\u0430 \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442\u043e\u0432'
+        ,'Click, drag, or paste screenshots here (PNG, JPG, GIF, WEBP, up to 8MB each)': '\u041a\u043b\u0438\u043a, drag&drop \u0438\u043b\u0438 \u0432\u0441\u0442\u0430\u0432\u043a\u0430 \u0441\u043a\u0440\u0438\u043d\u0448\u043e\u0442\u043e\u0432 \u0441\u044e\u0434\u0430 (PNG, JPG, GIF, WEBP, \u0434\u043e 8MB \u043a\u0430\u0436\u0434\u044b\u0439)'
     };
 
-    const translate = (input) => {
-        if (lang !== 'ru') {
-            return input;
+    const ua = {
+        'Dashboard': '\u0414\u0430\u0448\u0431\u043e\u0440\u0434',
+        'My Day': '\u041c\u0456\u0439 \u0434\u0435\u043d\u044c',
+        'Projects': '\u041f\u0440\u043e\u0454\u043a\u0442\u0438',
+        'Bugs': '\u0411\u0430\u0433\u0438',
+        'Test Plans': '\u0422\u0435\u0441\u0442-\u043f\u043b\u0430\u043d\u0438',
+        'Test Runs': '\u0422\u0435\u0441\u0442-\u0440\u0430\u043d\u0438',
+        'Wiki': '\u0412\u0456\u043a\u0456',
+        'Kanban': '\u041a\u0430\u043d\u0431\u0430\u043d',
+        'Calendar': '\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440',
+        'Reports': '\u0417\u0432\u0456\u0442\u0438',
+        'Users': '\u041a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0456',
+        'Favorites': '\u041e\u0431\u0440\u0430\u043d\u0435',
+        'No favorites yet.': '\u041f\u043e\u043a\u0438 \u043d\u0435\u043c\u0430\u0454 \u043e\u0431\u0440\u0430\u043d\u043e\u0433\u043e.',
+        'Search (Ctrl+K)': '\u041f\u043e\u0448\u0443\u043a (Ctrl+K)',
+        'Type to search...': '\u0412\u0432\u0435\u0434\u0456\u0442\u044c \u0434\u043b\u044f \u043f\u043e\u0448\u0443\u043a\u0443...',
+        'Settings': '\u041d\u0430\u043b\u0430\u0448\u0442\u0443\u0432\u0430\u043d\u043d\u044f',
+        'Language': '\u041c\u043e\u0432\u0430',
+        'English': '\u0410\u043d\u0433\u043b\u0456\u0439\u0441\u044c\u043a\u0430',
+        'Russian': '\u0420\u043e\u0441\u0456\u0439\u0441\u044c\u043a\u0430',
+        'Ukrainian': '\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430',
+        'Save': '\u0417\u0431\u0435\u0440\u0435\u0433\u0442\u0438',
+        'Cancel': '\u0421\u043a\u0430\u0441\u0443\u0432\u0430\u0442\u0438',
+        'Back': '\u041d\u0430\u0437\u0430\u0434',
+        'Open': '\u0412\u0456\u0434\u043a\u0440\u0438\u0442\u0438',
+        'Edit': '\u0420\u0435\u0434\u0430\u0433\u0443\u0432\u0430\u0442\u0438',
+        'Delete': '\u0412\u0438\u0434\u0430\u043b\u0438\u0442\u0438',
+        'Actions': '\u0414\u0456\u0457',
+        'Name': '\u041d\u0430\u0437\u0432\u0430',
+        'Description': '\u041e\u043f\u0438\u0441',
+        'Status': '\u0421\u0442\u0430\u0442\u0443\u0441',
+        'Project': '\u041f\u0440\u043e\u0454\u043a\u0442',
+        'User': '\u041a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447',
+        'Role': '\u0420\u043e\u043b\u044c',
+        'Username': '\u041b\u043e\u0433\u0456\u043d',
+        'Password': '\u041f\u0430\u0440\u043e\u043b\u044c',
+        'Create User': '\u0421\u0442\u0432\u043e\u0440\u0438\u0442\u0438 \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430',
+        'Update User': '\u041e\u043d\u043e\u0432\u0438\u0442\u0438 \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430',
+        'Users Base': '\u0411\u0430\u0437\u0430 \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0456\u0432',
+        'New User': '\u041d\u043e\u0432\u0438\u0439 \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447',
+        'Create Project': '\u0421\u0442\u0432\u043e\u0440\u0438\u0442\u0438 \u043f\u0440\u043e\u0454\u043a\u0442',
+        'Update Project': '\u041e\u043d\u043e\u0432\u0438\u0442\u0438 \u043f\u0440\u043e\u0454\u043a\u0442',
+        'Project name': '\u041d\u0430\u0437\u0432\u0430 \u043f\u0440\u043e\u0454\u043a\u0442\u0443',
+        'Manage accounts, roles and access': '\u041a\u0435\u0440\u0443\u0432\u0430\u043d\u043d\u044f \u043e\u0431\u043b\u0456\u043a\u043e\u0432\u0438\u043c\u0438 \u0437\u0430\u043f\u0438\u0441\u0430\u043c\u0438, \u0440\u043e\u043b\u044f\u043c\u0438 \u0442\u0430 \u0434\u043e\u0441\u0442\u0443\u043f\u043e\u043c',
+        'Manage projects and statuses': '\u041a\u0435\u0440\u0443\u0432\u0430\u043d\u043d\u044f \u043f\u0440\u043e\u0454\u043a\u0442\u0430\u043c\u0438 \u0442\u0430 \u0441\u0442\u0430\u0442\u0443\u0441\u0430\u043c\u0438',
+        'Delete project?': '\u0412\u0438\u0434\u0430\u043b\u0438\u0442\u0438 \u043f\u0440\u043e\u0454\u043a\u0442?',
+        'Delete user?': '\u0412\u0438\u0434\u0430\u043b\u0438\u0442\u0438 \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430?',
+        'Project created': '\u041f\u0440\u043e\u0454\u043a\u0442 \u0441\u0442\u0432\u043e\u0440\u0435\u043d\u043e',
+        'Project updated': '\u041f\u0440\u043e\u0454\u043a\u0442 \u043e\u043d\u043e\u0432\u043b\u0435\u043d\u043e',
+        'Project deleted': '\u041f\u0440\u043e\u0454\u043a\u0442 \u0432\u0438\u0434\u0430\u043b\u0435\u043d\u043e',
+        'Cannot delete project: linked records exist': '\u041d\u0435\u043c\u043e\u0436\u043b\u0438\u0432\u043e \u0432\u0438\u0434\u0430\u043b\u0438\u0442\u0438 \u043f\u0440\u043e\u0454\u043a\u0442: \u0454 \u043f\u043e\u0432\u2019\u044f\u0437\u0430\u043d\u0456 \u0437\u0430\u043f\u0438\u0441\u0438',
+        'User created': '\u041a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430 \u0441\u0442\u0432\u043e\u0440\u0435\u043d\u043e',
+        'User updated': '\u041a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430 \u043e\u043d\u043e\u0432\u043b\u0435\u043d\u043e',
+        'User deleted': '\u041a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430 \u0432\u0438\u0434\u0430\u043b\u0435\u043d\u043e',
+        'You cannot delete your own account': '\u041d\u0435 \u043c\u043e\u0436\u043d\u0430 \u0432\u0438\u0434\u0430\u043b\u0438\u0442\u0438 \u0432\u043b\u0430\u0441\u043d\u0438\u0439 \u0430\u043a\u0430\u0443\u043d\u0442',
+        'Cannot delete user: linked records exist': '\u041d\u0435\u043c\u043e\u0436\u043b\u0438\u0432\u043e \u0432\u0438\u0434\u0430\u043b\u0438\u0442\u0438 \u043a\u043e\u0440\u0438\u0441\u0442\u0443\u0432\u0430\u0447\u0430: \u0454 \u043f\u043e\u0432\u2019\u044f\u0437\u0430\u043d\u0456 \u0437\u0430\u043f\u0438\u0441\u0438',
+        'Screenshots': '\u0421\u043a\u0440\u0456\u043d\u0448\u043e\u0442\u0438',
+        'Upload screenshots': '\u0417\u0430\u0432\u0430\u043d\u0442\u0430\u0436\u0438\u0442\u0438 \u0441\u043a\u0440\u0456\u043d\u0448\u043e\u0442\u0438',
+        'Comments': '\u041a\u043e\u043c\u0435\u043d\u0442\u0430\u0440\u0456',
+        'Add a comment': '\u0414\u043e\u0434\u0430\u0442\u0438 \u043a\u043e\u043c\u0435\u043d\u0442\u0430\u0440',
+        'Post': '\u041d\u0430\u0434\u0456\u0441\u043b\u0430\u0442\u0438',
+        'Possible duplicates:': '\u041c\u043e\u0436\u043b\u0438\u0432\u0456 \u0434\u0443\u0431\u043b\u0456\u043a\u0430\u0442\u0438:',
+        'Back to list': '\u041d\u0430\u0437\u0430\u0434 \u0434\u043e \u0441\u043f\u0438\u0441\u043a\u0443'
+        ,'Toggle theme': '\u041f\u0435\u0440\u0435\u043c\u043a\u043d\u0443\u0442\u0438 \u0442\u0435\u043c\u0443'
+        ,'Change language': '\u0417\u043c\u0456\u043d\u0438\u0442\u0438 \u043c\u043e\u0432\u0443'
+        ,'English (EN)': '\u0410\u043d\u0433\u043b\u0456\u0439\u0441\u044c\u043a\u0430 (EN)'
+        ,'Russian (RU)': '\u0420\u043e\u0441\u0456\u0439\u0441\u044c\u043a\u0430 (RU)'
+        ,'Ukrainian (UA)': '\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430 (UA)'
+        ,'Add column': '\u0414\u043e\u0434\u0430\u0442\u0438 \u0441\u0442\u043e\u0432\u043f\u0435\u0446\u044c'
+        ,'Column name': '\u041d\u0430\u0437\u0432\u0430 \u0441\u0442\u043e\u0432\u043f\u0446\u044f'
+        ,'Create column': '\u0421\u0442\u0432\u043e\u0440\u0438\u0442\u0438 \u0441\u0442\u043e\u0432\u043f\u0435\u0446\u044c'
+        ,'Create': '\u0421\u0442\u0432\u043e\u0440\u0438\u0442\u0438'
+        ,'Execution Overview': '\u041e\u0433\u043b\u044f\u0434 \u0432\u0438\u043a\u043e\u043d\u0430\u043d\u044c'
+        ,'Quick Actions': '\u0428\u0432\u0438\u0434\u043a\u0456 \u0434\u0456\u0457'
+        ,'My Tasks': '\u041c\u043e\u0457 \u0437\u0430\u0432\u0434\u0430\u043d\u043d\u044f'
+        ,'No open tasks.': '\u041d\u0435\u043c\u0430\u0454 \u0432\u0456\u0434\u043a\u0440\u0438\u0442\u0438\u0445 \u0437\u0430\u0432\u0434\u0430\u043d\u044c.'
+        ,'Create Wiki Page': '\u0421\u0442\u0432\u043e\u0440\u0438\u0442\u0438 \u0441\u0442\u043e\u0440\u0456\u043d\u043a\u0443 \u0432\u0456\u043a\u0456'
+        ,'Test Runs Today': '\u0422\u0435\u0441\u0442-\u0440\u0430\u043d\u0438 \u0441\u044c\u043e\u0433\u043e\u0434\u043d\u0456'
+        ,'Runs completed': '\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e \u0440\u0430\u043d\u0456\u0432'
+        ,'Pass today:': 'Pass \u0441\u044c\u043e\u0433\u043e\u0434\u043d\u0456:'
+        ,'Fail today:': 'Fail \u0441\u044c\u043e\u0433\u043e\u0434\u043d\u0456:'
+        ,'In Progress': '\u0412 \u0440\u043e\u0431\u043e\u0442\u0456'
+        ,'Edit column': '\u0420\u0435\u0434\u0430\u0433\u0443\u0432\u0430\u0442\u0438 \u0441\u0442\u043e\u0432\u043f\u0435\u0446\u044c'
+        ,'Delete column': '\u0412\u0438\u0434\u0430\u043b\u0438\u0442\u0438 \u0441\u0442\u043e\u0432\u043f\u0435\u0446\u044c'
+        ,'Edit card': '\u0420\u0435\u0434\u0430\u0433\u0443\u0432\u0430\u0442\u0438 \u043a\u0430\u0440\u0442\u043a\u0443'
+        ,'Delete card': '\u0412\u0438\u0434\u0430\u043b\u0438\u0442\u0438 \u043a\u0430\u0440\u0442\u043a\u0443'
+        ,'Save Card': '\u0417\u0431\u0435\u0440\u0435\u0433\u0442\u0438 \u043a\u0430\u0440\u0442\u043a\u0443'
+        ,'Delete card?': '\u0412\u0438\u0434\u0430\u043b\u0438\u0442\u0438 \u043a\u0430\u0440\u0442\u043a\u0443?'
+        ,'Delete column?': '\u0412\u0438\u0434\u0430\u043b\u0438\u0442\u0438 \u0441\u0442\u043e\u0432\u043f\u0435\u0446\u044c?'
+        ,'Unable to delete card': '\u041d\u0435 \u0432\u0434\u0430\u043b\u043e\u0441\u044f \u0432\u0438\u0434\u0430\u043b\u0438\u0442\u0438 \u043a\u0430\u0440\u0442\u043a\u0443'
+        ,'Unable to update column': '\u041d\u0435 \u0432\u0434\u0430\u043b\u043e\u0441\u044f \u043e\u043d\u043e\u0432\u0438\u0442\u0438 \u0441\u0442\u043e\u0432\u043f\u0435\u0446\u044c'
+        ,'Unable to create column': '\u041d\u0435 \u0432\u0434\u0430\u043b\u043e\u0441\u044f \u0441\u0442\u0432\u043e\u0440\u0438\u0442\u0438 \u0441\u0442\u043e\u0432\u043f\u0435\u0446\u044c'
+        ,'Column is not empty': '\u0421\u0442\u043e\u0432\u043f\u0435\u0446\u044c \u043d\u0435 \u043f\u043e\u0440\u043e\u0436\u043d\u0456\u0439'
+        ,'Request failed': '\u0417\u0430\u043f\u0438\u0442 \u043d\u0435 \u0432\u0438\u043a\u043e\u043d\u0430\u043d\u043e'
+        ,'No boards configured.': '\u0414\u043e\u0448\u043a\u0438 \u043d\u0435 \u043d\u0430\u043b\u0430\u0448\u0442\u043e\u0432\u0430\u043d\u0456.'
+        ,'Two-Factor Verification': '\u0414\u0432\u043e\u0444\u0430\u043a\u0442\u043e\u0440\u043d\u0430 \u043f\u0435\u0440\u0435\u0432\u0456\u0440\u043a\u0430'
+        ,'Enter the 6-digit code from Google Authenticator.': '\u0412\u0432\u0435\u0434\u0456\u0442\u044c 6-\u0437\u043d\u0430\u0447\u043d\u0438\u0439 \u043a\u043e\u0434 \u0437 Google Authenticator.'
+        ,'Authentication code': '\u041a\u043e\u0434 \u043f\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0436\u0435\u043d\u043d\u044f'
+        ,'Verify': '\u041f\u0435\u0440\u0435\u0432\u0456\u0440\u0438\u0442\u0438'
+        ,'Cancel login': '\u0421\u043a\u0430\u0441\u0443\u0432\u0430\u0442\u0438 \u0432\u0445\u0456\u0434'
+        ,'2FA Setup': '\u041d\u0430\u043b\u0430\u0448\u0442\u0443\u0432\u0430\u043d\u043d\u044f 2FA'
+        ,'Enable Google Authenticator based 2FA for your account.': '\u0423\u0432\u0456\u043c\u043a\u043d\u0456\u0442\u044c 2FA \u0447\u0435\u0440\u0435\u0437 Google Authenticator \u0434\u043b\u044f \u0441\u0432\u043e\u0433\u043e \u0430\u043a\u0430\u0443\u043d\u0442\u0430.'
+        ,'Start setup': '\u041f\u043e\u0447\u0430\u0442\u0438 \u043d\u0430\u043b\u0430\u0448\u0442\u0443\u0432\u0430\u043d\u043d\u044f'
+        ,'Step 1: Add this secret to Google Authenticator:': '\u041a\u0440\u043e\u043a 1: \u0414\u043e\u0434\u0430\u0439\u0442\u0435 \u0446\u0435\u0439 \u0441\u0435\u043a\u0440\u0435\u0442 \u0434\u043e Google Authenticator:'
+        ,'Alternative URI:': '\u0410\u043b\u044c\u0442\u0435\u0440\u043d\u0430\u0442\u0438\u0432\u043d\u0438\u0439 URI:'
+        ,'Enable 2FA': '\u0423\u0432\u0456\u043c\u043a\u043d\u0443\u0442\u0438 2FA'
+        ,'Reset secret': '\u0421\u043a\u0438\u043d\u0443\u0442\u0438 \u0441\u0435\u043a\u0440\u0435\u0442'
+        ,'2FA is enabled for your account.': '2FA \u0443\u0432\u0456\u043c\u043a\u043d\u0435\u043d\u043e \u0434\u043b\u044f \u0432\u0430\u0448\u043e\u0433\u043e \u0430\u043a\u0430\u0443\u043d\u0442\u0430.'
+        ,'Disable 2FA': '\u0412\u0438\u043c\u043a\u043d\u0443\u0442\u0438 2FA'
+        ,'Disable 2FA?': '\u0412\u0438\u043c\u043a\u043d\u0443\u0442\u0438 2FA?'
+        ,'Too many login attempts. Try again in 15 minutes.': '\u0417\u0430\u043d\u0430\u0434\u0442\u043e \u0431\u0430\u0433\u0430\u0442\u043e \u0441\u043f\u0440\u043e\u0431 \u0432\u0445\u043e\u0434\u0443. \u0421\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u0447\u0435\u0440\u0435\u0437 15 \u0445\u0432\u0438\u043b\u0438\u043d.'
+        ,'Too many invalid 2FA attempts. Try again later.': '\u0417\u0430\u043d\u0430\u0434\u0442\u043e \u0431\u0430\u0433\u0430\u0442\u043e \u043d\u0435\u0432\u0456\u0440\u043d\u0438\u0445 \u0441\u043f\u0440\u043e\u0431 2FA. \u0421\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u043f\u0456\u0437\u043d\u0456\u0448\u0435.'
+        ,'Invalid authentication code': '\u041d\u0435\u0432\u0456\u0440\u043d\u0438\u0439 \u043a\u043e\u0434 \u043f\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0436\u0435\u043d\u043d\u044f'
+        ,'2FA session expired. Login again.': '\u0421\u0435\u0441\u0456\u044f 2FA \u0437\u0430\u0432\u0435\u0440\u0448\u0438\u043b\u0430\u0441\u044f. \u0423\u0432\u0456\u0439\u0434\u0456\u0442\u044c \u0437\u043d\u043e\u0432\u0443.'
+        ,'2FA setup started. Scan secret and confirm code.': '\u041d\u0430\u043b\u0430\u0448\u0442\u0443\u0432\u0430\u043d\u043d\u044f 2FA \u0440\u043e\u0437\u043f\u043e\u0447\u0430\u0442\u043e. \u0412\u0456\u0434\u0441\u043a\u0430\u043d\u0443\u0439\u0442\u0435 \u0441\u0435\u043a\u0440\u0435\u0442 \u0456 \u043f\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u044c\u0442\u0435 \u043a\u043e\u0434.'
+        ,'Invalid code. Try again.': '\u041d\u0435\u0432\u0456\u0440\u043d\u0438\u0439 \u043a\u043e\u0434. \u0421\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u0449\u0435 \u0440\u0430\u0437.'
+        ,'2FA enabled': '2FA \u0443\u0432\u0456\u043c\u043a\u043d\u0435\u043d\u043e'
+        ,'2FA disabled': '2FA \u0432\u0438\u043c\u043a\u043d\u0435\u043d\u043e'
+        ,'Filter: runs with': '\u0424\u0456\u043b\u044c\u0442\u0440: \u0440\u0430\u043d\u0438 \u0437'
+        ,'results': '\u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0430\u043c\u0438'
+        ,'clear': '\u043e\u0447\u0438\u0441\u0442\u0438\u0442\u0438'
+        ,'Login - YJH': '\u0412\u0445\u0456\u0434 - YJH'
+        ,'Sign in': '\u0423\u0432\u0456\u0439\u0442\u0438'
+        ,'Login': '\u0423\u0432\u0456\u0439\u0442\u0438'
+        ,'Email': 'Email'
+        ,'Theme': '\u0422\u0435\u043c\u0430'
+        ,'Light': '\u0421\u0432\u0456\u0442\u043b\u0430'
+        ,'Dark': '\u0422\u0435\u043c\u043d\u0430'
+        ,'New password': '\u041d\u043e\u0432\u0438\u0439 \u043f\u0430\u0440\u043e\u043b\u044c'
+        ,'Leave empty': '\u0417\u0430\u043b\u0438\u0448\u0442\u0435 \u043f\u043e\u0440\u043e\u0436\u043d\u0456\u043c'
+        ,'Team Calendar': '\u041a\u0430\u043b\u0435\u043d\u0434\u0430\u0440 \u043a\u043e\u043c\u0430\u043d\u0434\u0438'
+        ,'Add absence': '\u0414\u043e\u0434\u0430\u0442\u0438 \u0432\u0456\u0434\u0441\u0443\u0442\u043d\u0456\u0441\u0442\u044c'
+        ,'Vacation': '\u0412\u0456\u0434\u043f\u0443\u0441\u0442\u043a\u0430'
+        ,'Sick leave': '\u041b\u0456\u043a\u0430\u0440\u043d\u044f\u043d\u0438\u0439'
+        ,'Day off': '\u0412\u0438\u0445\u0456\u0434\u043d\u0438\u0439'
+        ,'Conference': '\u041a\u043e\u043d\u0444\u0435\u0440\u0435\u043d\u0446\u0456\u044f'
+        ,'Other': '\u0406\u043d\u0448\u0435'
+        ,'Reason': '\u041f\u0440\u0438\u0447\u0438\u043d\u0430'
+        ,'Type': '\u0422\u0438\u043f'
+        ,'From': '\u0417'
+        ,'To': '\u041f\u043e'
+        ,'Release': '\u0420\u0435\u043b\u0456\u0437'
+        ,'Planned': '\u0417\u0430\u043f\u043b\u0430\u043d\u043e\u0432\u0430\u043d\u043e'
+        ,'Released': '\u0412\u0438\u043f\u0443\u0449\u0435\u043d\u043e'
+        ,'Cancelled': '\u0421\u043a\u0430\u0441\u043e\u0432\u0430\u043d\u043e'
+        ,'Date': '\u0414\u0430\u0442\u0430'
+        ,'Create Plan': '\u0421\u0442\u0432\u043e\u0440\u0438\u0442\u0438 \u043f\u043b\u0430\u043d'
+        ,'Plan name': '\u041d\u0430\u0437\u0432\u0430 \u043f\u043b\u0430\u043d\u0443'
+        ,'Draft': '\u0427\u0435\u0440\u043d\u0435\u0442\u043a\u0430'
+        ,'Active': '\u0410\u043a\u0442\u0438\u0432\u043d\u0438\u0439'
+        ,'Completed': '\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e'
+        ,'Create Suite': '\u0421\u0442\u0432\u043e\u0440\u0438\u0442\u0438 \u043d\u0430\u0431\u0456\u0440'
+        ,'Suite name': '\u041d\u0430\u0437\u0432\u0430 \u043d\u0430\u0431\u043e\u0440\u0443'
+        ,'No parent': '\u0411\u0435\u0437 \u0431\u0430\u0442\u044c\u043a\u0456\u0432\u0441\u044c\u043a\u043e\u0433\u043e'
+        ,'Suites': '\u041d\u0430\u0431\u043e\u0440\u0438'
+        ,'Create Test Run': '\u0421\u0442\u0432\u043e\u0440\u0438\u0442\u0438 \u0442\u0435\u0441\u0442-\u0440\u0430\u043d'
+        ,'Run name': '\u041d\u0430\u0437\u0432\u0430 \u0440\u0430\u043d\u0443'
+        ,'Unassigned': '\u041d\u0435 \u043f\u0440\u0438\u0437\u043d\u0430\u0447\u0435\u043d\u043e'
+        ,'Execute': '\u0412\u0438\u043a\u043e\u043d\u0430\u0442\u0438'
+        ,'Case': '\u041a\u0435\u0439\u0441'
+        ,'Notes': '\u041d\u043e\u0442\u0430\u0442\u043a\u0438'
+        ,'Create bug': '\u0421\u0442\u0432\u043e\u0440\u0438\u0442\u0438 \u0431\u0430\u0433'
+        ,'Filter name': '\u0406\u043c\u2019\u044f \u0444\u0456\u043b\u044c\u0442\u0440\u0430'
+        ,'Create Test Case': '\u0421\u0442\u0432\u043e\u0440\u0438\u0442\u0438 \u0442\u0435\u0441\u0442-\u043a\u0435\u0439\u0441'
+        ,'Create Test Plan': '\u0421\u0442\u0432\u043e\u0440\u0438\u0442\u0438 \u0442\u0435\u0441\u0442-\u043f\u043b\u0430\u043d'
+        ,'One platform. One team. One source of truth.': '\u041e\u0434\u043d\u0430 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0430. \u041e\u0434\u043d\u0430 \u043a\u043e\u043c\u0430\u043d\u0434\u0430. \u041e\u0434\u043d\u0435 \u0434\u0436\u0435\u0440\u0435\u043b\u043e \u043f\u0440\u0430\u0432\u0434\u0438.'
+        ,'Score:': '\u041e\u0446\u0456\u043d\u043a\u0430:'
+        ,'Pass': 'Pass'
+        ,'Fail': 'Fail'
+        ,'Opened': '\u0412\u0456\u0434\u043a\u0440\u0438\u0442\u043e'
+        ,'Closed': '\u0417\u0430\u043a\u0440\u0438\u0442\u043e'
+        ,'New Bugs': '\u041d\u043e\u0432\u0456 \u0431\u0430\u0433\u0438'
+        ,'High Priority Bugs': '\u0411\u0430\u0433\u0438 \u0432\u0438\u0441\u043e\u043a\u043e\u0433\u043e \u043f\u0440\u0456\u043e\u0440\u0438\u0442\u0435\u0442\u0443'
+        ,'Add Card': '\u0414\u043e\u0434\u0430\u0442\u0438 \u043a\u0430\u0440\u0442\u043a\u0443'
+        ,'Cancel edit': '\u0421\u043a\u0430\u0441\u0443\u0432\u0430\u0442\u0438 \u0440\u0435\u0434\u0430\u0433\u0443\u0432\u0430\u043d\u043d\u044f'
+        ,'ID': 'ID'
+        ,'Title': '\u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a'
+        ,'Assignee': '\u0412\u0438\u043a\u043e\u043d\u0430\u0432\u0435\u0446\u044c'
+        ,'All projects': '\u0423\u0441\u0456 \u043f\u0440\u043e\u0454\u043a\u0442\u0438'
+        ,'Apply': '\u0417\u0430\u0441\u0442\u043e\u0441\u0443\u0432\u0430\u0442\u0438'
+        ,'Save Filter': '\u0417\u0431\u0435\u0440\u0435\u0433\u0442\u0438 \u0444\u0456\u043b\u044c\u0442\u0440'
+        ,'Saved filters:': '\u0417\u0431\u0435\u0440\u0435\u0436\u0435\u043d\u0456 \u0444\u0456\u043b\u044c\u0442\u0440\u0438:'
+        ,'Runs completed': '\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e \u0440\u0430\u043d\u0456\u0432'
+        ,'Test run not found': '\u0422\u0435\u0441\u0442-\u0440\u0430\u043d \u043d\u0435 \u0437\u043d\u0430\u0439\u0434\u0435\u043d\u043e'
+        ,'Test plan not found': '\u0422\u0435\u0441\u0442-\u043f\u043b\u0430\u043d \u043d\u0435 \u0437\u043d\u0430\u0439\u0434\u0435\u043d\u043e'
+        ,'Project not found': '\u041f\u0440\u043e\u0454\u043a\u0442 \u043d\u0435 \u0437\u043d\u0430\u0439\u0434\u0435\u043d\u043e'
+        ,'Page not found': '\u0421\u0442\u043e\u0440\u0456\u043d\u043a\u0443 \u043d\u0435 \u0437\u043d\u0430\u0439\u0434\u0435\u043d\u043e'
+        ,'Show risk drivers': '\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u0438 \u0447\u0438\u043d\u043d\u0438\u043a\u0438 \u0440\u0438\u0437\u0438\u043a\u0443'
+        ,'Blocker bugs:': '\u0411\u043b\u043e\u043a\u0443\u044e\u0447\u0456 \u0431\u0430\u0433\u0438:'
+        ,'Critical bugs:': '\u041a\u0440\u0438\u0442\u0438\u0447\u043d\u0456 \u0431\u0430\u0433\u0438:'
+        ,'High priority bugs:': '\u0411\u0430\u0433\u0438 \u0432\u0438\u0441\u043e\u043a\u043e\u0433\u043e \u043f\u0440\u0456\u043e\u0440\u0438\u0442\u0435\u0442\u0443:'
+        ,'Pass rate:': '\u0420\u0456\u0432\u0435\u043d\u044c Pass:'
+        ,'Open risky bugs': '\u0412\u0456\u0434\u043a\u0440\u0438\u0442\u0438 \u0440\u0438\u0437\u0438\u043a\u043e\u0432\u0456 \u0431\u0430\u0433\u0438'
+        ,'Project Scope': '\u041e\u0445\u043e\u043f\u043b\u0435\u043d\u043d\u044f \u043f\u0440\u043e\u0454\u043a\u0442\u0443'
+        ,'Selected:': '\u0412\u0438\u0431\u0440\u0430\u043d\u043e:'
+        ,'Selected: All projects': '\u0412\u0438\u0431\u0440\u0430\u043d\u043e: \u0423\u0441\u0456 \u043f\u0440\u043e\u0454\u043a\u0442\u0438'
+        ,'Documentation': '\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430\u0446\u0456\u044f'
+        ,'Test plans': '\u0422\u0435\u0441\u0442-\u043f\u043b\u0430\u043d\u0438'
+        ,'Test cases': '\u0422\u0435\u0441\u0442-\u043a\u0435\u0439\u0441\u0438'
+        ,'No plans available': '\u041d\u0435\u043c\u0430\u0454 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u0438\u0445 \u043f\u043b\u0430\u043d\u0456\u0432'
+        ,'Select a test plan before creating a run': '\u041e\u0431\u0435\u0440\u0456\u0442\u044c \u0442\u0435\u0441\u0442-\u043f\u043b\u0430\u043d \u043f\u0435\u0440\u0435\u0434 \u0441\u0442\u0432\u043e\u0440\u0435\u043d\u043d\u044f\u043c \u0440\u0430\u043d\u0443'
+        ,'Risk Drivers': '\u0427\u0438\u043d\u043d\u0438\u043a\u0438 \u0440\u0438\u0437\u0438\u043a\u0443'
+        ,'Blockers': '\u0411\u043b\u043e\u043a\u0435\u0440\u0438'
+        ,'Critical': '\u041a\u0440\u0438\u0442\u0438\u0447\u043d\u0456'
+        ,'High Priority': '\u0412\u0438\u0441\u043e\u043a\u0438\u0439 \u043f\u0440\u0456\u043e\u0440\u0438\u0442\u0435\u0442'
+        ,'Prev': '\u041d\u0430\u0437\u0430\u0434'
+        ,'Next': '\u0414\u0430\u043b\u0456'
+        ,'Open original': '\u0412\u0456\u0434\u043a\u0440\u0438\u0442\u0438 \u043e\u0440\u0438\u0433\u0456\u043d\u0430\u043b'
+        ,'Click, drag, or paste screenshots': '\u041a\u043b\u0456\u043a, drag&drop \u0430\u0431\u043e \u0432\u0441\u0442\u0430\u0432\u043a\u0430 \u0441\u043a\u0440\u0456\u043d\u0448\u043e\u0442\u0456\u0432'
+        ,'Click, drag, or paste screenshots here (PNG, JPG, GIF, WEBP, up to 8MB each)': '\u041a\u043b\u0456\u043a, drag&drop \u0430\u0431\u043e \u0432\u0441\u0442\u0430\u0432\u043a\u0430 \u0441\u043a\u0440\u0456\u043d\u0448\u043e\u0442\u0456\u0432 \u0441\u044e\u0434\u0438 (PNG, JPG, GIF, WEBP, \u0434\u043e 8MB \u043a\u043e\u0436\u0435\u043d)'
+    };
+
+    const dict = lang === 'ua' ? ua : ru;
+
+    const translate = (value) => {
+        if (!value) {
+            return value;
         }
-        if (/^Bug #\d+$/i.test(input)) {
-            return input.replace(/^Bug/i, 'Баг');
+        if (/^Bug #\d+$/i.test(value)) {
+            return value.replace(/^Bug/i, lang === 'ua' ? '\u0411\u0430\u0433' : '\u0411\u0430\u0433');
         }
-        if (/^Test Case #\d+$/i.test(input)) {
-            return input.replace(/^Test Case/i, 'Тест-кейс');
+        if (/^Test Case #\d+$/i.test(value)) {
+            return value.replace(/^Test Case/i, lang === 'ua' ? '\u0422\u0435\u0441\u0442-\u043a\u0435\u0439\u0441' : '\u0422\u0435\u0441\u0442-\u043a\u0435\u0439\u0441');
         }
-        return dictionary[input] || input;
+        return dict[value] || value;
     };
 
     window.uiT = translate;
 
-    if (lang !== 'ru') {
-        return;
-    }
+    const skipTags = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT']);
 
     const translateTextNode = (node) => {
         const raw = node.nodeValue;
         if (!raw || !raw.trim()) {
             return;
         }
-        const leading = raw.match(/^\s*/)[0];
-        const trailing = raw.match(/\s*$/)[0];
+        const leading = raw.match(/^\s*/)?.[0] || '';
+        const trailing = raw.match(/\s*$/)?.[0] || '';
         const core = raw.trim();
         const converted = translate(core);
         if (converted !== core) {
@@ -295,8 +463,9 @@
     };
 
     const translateAttributes = (root) => {
+        const attrs = ['placeholder', 'title', 'aria-label'];
         root.querySelectorAll('[placeholder],[title],[aria-label]').forEach((el) => {
-            ['placeholder', 'title', 'aria-label'].forEach((attr) => {
+            attrs.forEach((attr) => {
                 if (!el.hasAttribute(attr)) {
                     return;
                 }
@@ -316,43 +485,42 @@
         const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
             acceptNode(node) {
                 const parent = node.parentElement;
-                if (!parent) {
+                if (!parent || skipTags.has(parent.tagName)) {
                     return NodeFilter.FILTER_REJECT;
                 }
-                const tag = parent.tagName;
-                if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'TEXTAREA') {
+                if (!node.nodeValue || !node.nodeValue.trim()) {
                     return NodeFilter.FILTER_REJECT;
                 }
                 return NodeFilter.FILTER_ACCEPT;
             }
         });
 
-        let node = walker.nextNode();
-        while (node) {
-            translateTextNode(node);
-            node = walker.nextNode();
+        const nodes = [];
+        let current = walker.nextNode();
+        while (current) {
+            nodes.push(current);
+            current = walker.nextNode();
         }
-
-        translateAttributes(root);
+        nodes.forEach(translateTextNode);
     };
 
+    translateAttributes(document.body);
     translateTree(document.body);
 
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-            mutation.addedNodes.forEach((added) => {
-                if (added.nodeType === Node.TEXT_NODE) {
-                    translateTextNode(added);
-                } else if (added.nodeType === Node.ELEMENT_NODE) {
-                    translateTree(added);
+            mutation.addedNodes.forEach((node) => {
+                if (!(node instanceof Element)) {
+                    return;
                 }
+                translateAttributes(node);
+                translateTree(node);
             });
+            if (mutation.type === 'characterData' && mutation.target instanceof Text) {
+                translateTextNode(mutation.target);
+            }
         });
     });
 
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
 })();
-

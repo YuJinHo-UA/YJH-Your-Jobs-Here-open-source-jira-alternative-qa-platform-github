@@ -6,12 +6,16 @@
 
     const applyTheme = (theme) => {
         const isDark = theme === 'dark';
+        body.classList.add('theme-switching');
         root.classList.toggle('theme-dark', isDark);
         root.classList.toggle('theme-light', !isDark);
         root.dataset.theme = theme;
         body.classList.toggle('theme-dark', isDark);
         body.classList.toggle('theme-light', !isDark);
         body.dataset.theme = theme;
+        root.style.colorScheme = isDark ? 'dark' : 'light';
+        window.dispatchEvent(new CustomEvent('yjh:theme-changed', { detail: { theme } }));
+        window.setTimeout(() => body.classList.remove('theme-switching'), 260);
     };
 
     if (savedTheme === 'dark' || savedTheme === 'light') {

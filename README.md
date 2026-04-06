@@ -1,40 +1,89 @@
-# YJH - Quality Management Platform
+# YJH (Your Job's Here)
 
-YJH is an integrated QA platform that combines bug tracking, test management, wiki knowledge base, kanban, and release risk analytics in one lightweight PHP + SQLite stack.
+YJH - открытая QA-платформа: баг-трекинг, тест-менеджмент, wiki, kanban, аналитика и оценка release-risk в одном легком стеке `PHP + SQLite`.
 
-## Why YJH
-- One tool instead of Jira + TestRail + Confluence split.
-- Fast local deployment (no heavy infra required).
-- Built-in traceability: `test case -> execution -> bug -> commit`.
-- Product-level QA features: Risk Engine, checklist-driven testing, auto bug creation, wiki versioning.
+## Миссия
+Сделать продукт, который может использовать, форкать и улучшать каждый.
 
-## Core Modules
-- Bugs: `bugs.php`, `bug.php`, `api/bugs.php`
-- Test Management: `testplans.php`, `testplan.php`, `testcase.php`, `testruns.php`, `testrun.php`
-- Wiki: `wiki.php`, `wiki-page.php`, `api/wiki.php`
-- Kanban: `kanban.php`, `api/kanban.php`
-- Analytics: `index.php`, `reports.php`, `assets/js/charts.js`
-- Global Search: `api/search.php`, `assets/js/search.js`
+## Автор и упоминание создателя
+- Создатель: **YuJinHo-UA**
+- Если вы используете проект в своем продукте, форке или внутреннем инструменте, сохраняйте видимое упоминание автора в `README`/`About`.
 
-## Tech Stack
-- Backend: PHP (procedural MVC-style pages + API endpoints)
-- Database: SQLite (`database.sqlite`)
-- UI: Bootstrap 5 + Chart.js + custom JS
-- Security: CSRF protection + server-side escaping helpers
+## Почему YJH
+- Один инструмент вместо разрозненного набора сервисов.
+- Быстрый локальный запуск без тяжелой инфраструктуры.
+- Сквозная трассировка: `test case -> execution -> bug -> commit`.
+- Практичный процесс для QA-команд и solo-разработчиков.
 
-## Documentation
-- Architecture: `docs/ARCHITECTURE.md`
-- Database: `docs/DATABASE.md`
-- API: `docs/API.md`
+## Ключевые возможности
+- Bugs: статусы, приоритеты, фильтры, комментарии, история.
+- Test Management: планы, кейсы, прогоны, создание бага из failed run.
+- Wiki: база знаний по проекту со структурой и историей.
+- Kanban: управление потоком задач по колонкам.
+- Analytics & Risk: pass/fail-графики, bug trends, риск релиза.
+- Productivity: глобальный поиск (`Ctrl+K`), черновики, переключение языка, My Day.
+- Security: CSRF, rate limit, security log, encryption helpers, 2FA (TOTP).
+
+## Скриншоты продукта
+> Изображения встроены прямо в `README`, чтобы на GitHub был виден сам продукт, а не только код.
+
+### Dashboard
+![Dashboard](screenshots/showcase/ai-chat-attachment-14732401186840566526.png)
+
+### Основные модули
+| Bugs | Kanban |
+|---|---|
+| ![Bugs](screenshots/showcase/ai-chat-attachment-1624986959054858335.png) | ![Kanban](screenshots/showcase/ai-chat-attachment-13915740559499240548.png) |
+
+| Test Plans | Test Runs |
+|---|---|
+| ![Test Plans](screenshots/showcase/ai-chat-attachment-11733418300926485501.png) | ![Test Runs](screenshots/showcase/ai-chat-attachment-8179432705481793422.png) |
+
+| Wiki | Team Calendar |
+|---|---|
+| ![Wiki](screenshots/showcase/ai-chat-attachment-15669031791100109440.png) | ![Calendar](screenshots/showcase/ai-chat-attachment-10791166956976575596.png) |
+
+### Дополнительно
+| Global Search | Users / Roles |
+|---|---|
+| ![Global Search](screenshots/showcase/ai-chat-attachment-8483730064423831511.png) | ![Users](screenshots/showcase/ai-chat-attachment-11695030083572732472.png) |
+
+## Быстрый старт (2 минуты)
+1. Установите `PHP 8.1+` и включите SQLite (`pdo_sqlite`).
+2. В корне проекта выполните:
+   ```bash
+   php -S 127.0.0.1:8000
+   ```
+3. Откройте `http://127.0.0.1:8000/login.php`.
+4. Демо-аккаунты:
+   - `admin@yujin.ho / admin123`
+   - `qa@yujin.ho / qa123`
+
+## Карта проекта (кратко)
+- Основные страницы: корневые `*.php` (`bugs.php`, `testplans.php`, `wiki.php`, `kanban.php` и т.д.)
+- API: `api/*.php`
+- Общая логика: `includes/*.php`
+- Конфиг и инициализация БД: `config/*.php`
+- Frontend: `assets/css`, `assets/js`
+- Документация: `docs/*.md`
+
+## Документация
 - Quick Start: `docs/QUICKSTART.md`
 - Install: `docs/INSTALL.md`
-- User Guide: `docs/USER_GUIDE.md`
 - Features: `docs/FEATURES.md`
-- Comparison: `docs/COMPARISON.md`
-- Roadmap: `docs/ROADMAP.md`
-- Why YJH: `docs/WHY_YJH.md`
-- Visualizations: `docs/VISUALIZATIONS.md`
-- Engineering Notes: `docs/ENGINEERING_NOTES.md`
+- API: `docs/API.md`
+- Architecture: `docs/ARCHITECTURE.md`
+- Security: `docs/SECURITY.md`
+- User Guide: `docs/USER_GUIDE.md`
+- Contributing: `docs/CONTRIBUTING.md`
 
-## Quick Start
-See `docs/QUICKSTART.md`.
+## Вклад в проект
+Проект открыт для всех: идеи, исправления, UX-улучшения, оптимизация, безопасность, документация.
+
+1. Сделайте fork репозитория.
+2. Вносите одно логически цельное изменение за PR.
+3. Добавляйте before/after и скриншоты для UI-изменений.
+4. Сохраняйте упоминание создателя в производных работах.
+
+## Лицензия
+См. `YJH_Docs_Package/LICENSE`.

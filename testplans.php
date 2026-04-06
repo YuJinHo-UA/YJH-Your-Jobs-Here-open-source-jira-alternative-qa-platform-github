@@ -6,9 +6,24 @@ require_once __DIR__ . '/includes/sidebar.php';
 $projects = fetch_all('SELECT * FROM projects');
 $releases = fetch_all('SELECT * FROM releases');
 $user = current_user();
+$selectedProjectId = (int)get_param('project_id', 0);
+$validProjectIds = array_map(static fn(array $project): int => (int)$project['id'], $projects);
+if ($selectedProjectId > 0 && !in_array($selectedProjectId, $validProjectIds, true)) {
+    $selectedProjectId = 0;
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
+    if (post_param('action') === 'delete_plan') {
+        $planId = (int)post_param('plan_id');
+        if ($planId > 0) {
+            delete_row('test_plans', ['id' => $planId]);
+            add_toast('Test plan deleted', 'success');
+        }
+        $redirectQuery = $selectedProjectId > 0 ? ('?project_id=' . $selectedProjectId) : '';
+        redirect('/testplans.php' . $redirectQuery);
+    }
+
     $stmt = db()->prepare('INSERT INTO test_plans (project_id, release_id, name, description, status, created_by) VALUES (:project_id, :release_id, :name, :description, :status, :created_by)');
     $stmt->execute([
         ':project_id' => post_param('project_id'),
@@ -18,15 +33,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':status' => post_param('status'),
         ':created_by' => $user['id'],
     ]);
+    record_activity('created', 'test_plan', (int)db()->lastInsertId(), [
+        'name' => (string)post_param('name'),
+        'project_id' => (int)post_param('project_id'),
+    ]);
     add_toast('Test plan created', 'success');
-    redirect('/testplans.php');
+    $targetProjectId = (int)post_param('project_id');
+    $redirectQuery = $targetProjectId > 0 ? ('?project_id=' . $targetProjectId) : '';
+    redirect('/testplans.php' . $redirectQuery);
 }
 
-$plans = fetch_all('SELECT t.*, p.name as project_name FROM test_plans t JOIN projects p ON p.id=t.project_id ORDER BY created_at DESC');
+$plansSql = 'SELECT t.*, p.name as project_name FROM test_plans t JOIN projects p ON p.id=t.project_id WHERE 1=1';
+$plansParams = [];
+if ($selectedProjectId > 0) {
+    $plansSql .= ' AND t.project_id = :project_id';
+    $plansParams[':project_id'] = $selectedProjectId;
+}
+$plansSql .= ' ORDER BY created_at DESC';
+$plans = fetch_all($plansSql, $plansParams);
 ?>
 <div class="app-content">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Test Plans</h2>
+        <form method="get" class="d-flex align-items-center gap-2">
+            <label for="testPlanProjectFilter" class="small text-muted mb-0">Project</label>
+            <select id="testPlanProjectFilter" name="project_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="0">All projects</option>
+                <?php foreach ($projects as $project): ?>
+                    <option value="<?php echo (int)$project['id']; ?>" <?php echo $selectedProjectId === (int)$project['id'] ? 'selected' : ''; ?>>
+                        <?php echo h($project['name']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </form>
     </div>
     <div class="row g-4">
         <div class="col-lg-4">
@@ -36,7 +75,7 @@ $plans = fetch_all('SELECT t.*, p.name as project_name FROM test_plans t JOIN pr
                     <input type="hidden" name="csrf_token" value="<?php echo h(csrf_token()); ?>">
                     <select class="form-select mb-2" name="project_id" required>
                         <?php foreach ($projects as $project): ?>
-                            <option value="<?php echo $project['id']; ?>"><?php echo h($project['name']); ?></option>
+                            <option value="<?php echo $project['id']; ?>" <?php echo $selectedProjectId === (int)$project['id'] ? 'selected' : ''; ?>><?php echo h($project['name']); ?></option>
                         <?php endforeach; ?>
                     </select>
                     <select class="form-select mb-2" name="release_id">
@@ -73,7 +112,15 @@ $plans = fetch_all('SELECT t.*, p.name as project_name FROM test_plans t JOIN pr
                             <td><?php echo h($plan['name']); ?></td>
                             <td><?php echo h($plan['project_name']); ?></td>
                             <td><?php echo h($plan['status']); ?></td>
-                            <td><a href="/testplan.php?id=<?php echo $plan['id']; ?>">Open</a></td>
+                            <td class="d-flex gap-2">
+                                <a href="/testplan.php?id=<?php echo $plan['id']; ?>">Open</a>
+                                <form method="post" onsubmit="return confirm('Delete this plan?');">
+                                    <input type="hidden" name="csrf_token" value="<?php echo h(csrf_token()); ?>">
+                                    <input type="hidden" name="action" value="delete_plan">
+                                    <input type="hidden" name="plan_id" value="<?php echo (int)$plan['id']; ?>">
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>

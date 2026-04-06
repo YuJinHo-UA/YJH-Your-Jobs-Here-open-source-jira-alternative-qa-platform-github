@@ -6,7 +6,24 @@
     const modalClose = document.getElementById('searchModalClose');
     const t = (value) => (window.uiT ? window.uiT(value) : value);
 
+    const resolveApiUrl = (endpoint) => {
+        const script = document.currentScript || document.querySelector('script[src*="search.js"]');
+        const src = script && script.src ? script.src : '';
+        if (src) {
+            const marker = '/assets/js/search.js';
+            const idx = src.indexOf(marker);
+            if (idx > -1) {
+                const base = src.slice(0, idx);
+                return `${base}${endpoint}`;
+            }
+        }
+        return endpoint;
+    };
+
     const openModal = () => {
+        if (!modal || !modalInput || !modalResults) {
+            return;
+        }
         modal.classList.add('active');
         modalInput.value = '';
         modalResults.innerHTML = '';
@@ -14,6 +31,9 @@
     };
 
     const closeModal = () => {
+        if (!modal) {
+            return;
+        }
         modal.classList.remove('active');
     };
 
@@ -45,7 +65,7 @@
             modalResults.innerHTML = '';
             return;
         }
-        const res = await fetch(`/api/search.php?q=${encodeURIComponent(query)}`);
+        const res = await fetch(`${resolveApiUrl('/api/search.php')}?q=${encodeURIComponent(query)}`);
         const payload = await res.json();
         renderResults(payload.results || {});
     };
@@ -59,11 +79,11 @@
     }
 
     document.addEventListener('keydown', (event) => {
-        if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        if ((event.metaKey || event.ctrlKey) && (event.code === 'KeyK' || event.key.toLowerCase() === 'k')) {
             event.preventDefault();
             openModal();
         }
-        if (event.key === 'Escape' && modal.classList.contains('active')) {
+        if (event.key === 'Escape' && modal && modal.classList.contains('active')) {
             closeModal();
         }
     });

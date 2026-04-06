@@ -61,4 +61,25 @@ if ($action === 'delete_column') {
     json_response(['status' => 'ok']);
 }
 
+if ($action === 'create_column') {
+    $boardId = (int)($payload['board_id'] ?? 0);
+    $name = trim((string)($payload['name'] ?? ''));
+    if ($boardId <= 0 || $name === '') {
+        json_response(['error' => 'Board and column name are required'], 400);
+    }
+
+    $orderStmt = db()->prepare('SELECT COALESCE(MAX(order_index), -1) FROM board_columns WHERE board_id = :board_id');
+    $orderStmt->execute([':board_id' => $boardId]);
+    $nextOrder = (int)$orderStmt->fetchColumn() + 1;
+
+    $stmt = db()->prepare('INSERT INTO board_columns (board_id, name, order_index, wip_limit) VALUES (:board_id, :name, :order_index, NULL)');
+    $stmt->execute([
+        ':board_id' => $boardId,
+        ':name' => $name,
+        ':order_index' => $nextOrder,
+    ]);
+
+    json_response(['status' => 'ok', 'column_id' => (int)db()->lastInsertId()]);
+}
+
 json_response(['error' => 'Invalid action'], 400);

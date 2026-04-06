@@ -5,7 +5,7 @@ require_once __DIR__ . '/includes/sidebar.php';
 
 $user = current_user();
 $id = (int)get_param('id');
-$page = fetch_one('SELECT * FROM wiki_pages WHERE id = :id', [':id' => $id]);
+$page = fetch_one('SELECT wp.*, p.name AS project_name FROM wiki_pages wp JOIN projects p ON p.id = wp.project_id WHERE wp.id = :id', [':id' => $id]);
 if (!$page) {
     echo '<div class="app-content">Page not found</div>';
     require_once __DIR__ . '/includes/footer.php';
@@ -14,8 +14,19 @@ if (!$page) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
+    $action = (string)post_param('action');
+    if ($action === 'delete_page') {
+        delete_row('wiki_pages', ['id' => $id]);
+        add_toast('Page deleted', 'success');
+        redirect('/wiki.php?project_id=' . (int)$page['project_id']);
+    }
+
     $newContent = post_param('content');
     $newTitle = post_param('title');
+    $newSlug = trim((string)post_param('slug'));
+    if ($newSlug === '') {
+        $newSlug = (string)$page['slug'];
+    }
 
     $stmt = db()->prepare('INSERT INTO wiki_history (page_id, user_id, content_diff, version) VALUES (:page_id, :user_id, :content_diff, :version)');
     $stmt->execute([
@@ -25,8 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':version' => $page['version'],
     ]);
 
-    $stmt = db()->prepare('UPDATE wiki_pages SET title=:title, content=:content, editor_id=:editor_id, version=version+1, updated_at=CURRENT_TIMESTAMP WHERE id=:id');
+    $stmt = db()->prepare('UPDATE wiki_pages SET slug=:slug, title=:title, content=:content, editor_id=:editor_id, version=version+1, updated_at=CURRENT_TIMESTAMP WHERE id=:id');
     $stmt->execute([
+        ':slug' => $newSlug,
         ':title' => $newTitle,
         ':content' => $newContent,
         ':editor_id' => $user['id'],
@@ -47,7 +59,14 @@ $rightContent = $rightVersion === $page['version'] ? $page['content'] : (fetch_o
 <div class="app-content">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2><?php echo h($page['title']); ?></h2>
-        <a class="btn btn-outline-secondary" href="/wiki.php">Back</a>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" href="/wiki.php?project_id=<?php echo (int)$page['project_id']; ?>">Back</a>
+            <form method="post" onsubmit="return confirm('Delete this page?');">
+                <input type="hidden" name="csrf_token" value="<?php echo h(csrf_token()); ?>">
+                <input type="hidden" name="action" value="delete_page">
+                <button class="btn btn-outline-danger" type="submit">Delete</button>
+            </form>
+        </div>
     </div>
 
     <div class="row g-4">
@@ -56,6 +75,8 @@ $rightContent = $rightVersion === $page['version'] ? $page['content'] : (fetch_o
                 <h6>Edit Page</h6>
                 <form method="post" data-draft-key="wiki-<?php echo $id; ?>">
                     <input type="hidden" name="csrf_token" value="<?php echo h(csrf_token()); ?>">
+                    <div class="small text-muted mb-2">Project: <?php echo h((string)$page['project_name']); ?></div>
+                    <input class="form-control mb-2" name="slug" value="<?php echo h((string)$page['slug']); ?>" required>
                     <input class="form-control mb-2" name="title" value="<?php echo h($page['title']); ?>" required>
                     <textarea class="form-control mb-2" name="content" rows="10"><?php echo h($page['content']); ?></textarea>
                     <button class="btn btn-primary">Save</button>

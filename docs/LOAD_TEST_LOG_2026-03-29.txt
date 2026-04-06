@@ -1,0 +1,33 @@
+2026-03-29 20:24:31.004557 | START load test users=50 tables=43
+2026-03-29 20:24:33.364625 | WRITE_SIM rollback mode: True | 50x inserts into bugs and test_cases executed inside rollback scope
+user=2 table=attachments ok=True time_ms=44.47 detail=count=4
+user=1 table=test_suites ok=True time_ms=25.07 detail=count=2
+user=1 table=ai_cache ok=True time_ms=18.94 detail=count=4
+user=1 table=boards ok=True time_ms=22.42 detail=count=1
+user=2 table=translation_cache ok=True time_ms=37.62 detail=count=0
+user=1 table=git_integrations ok=True time_ms=25.57 detail=count=0
+user=1 table=user_availability ok=True time_ms=35.33 detail=count=1
+user=1 table=releases ok=True time_ms=25.38 detail=count=2
+user=1 table=wiki_pages ok=True time_ms=33.50 detail=count=3
+user=2 table=ai_cache ok=True time_ms=34.91 detail=count=4
+user=1 table=users ok=True time_ms=33.52 detail=count=4
+user=2 table=git_commits ok=True time_ms=42.85 detail=count=0
+user=1 table=user_shortcuts ok=True time_ms=42.37 detail=count=0
+user=2 table=rate_limit_entries ok=True time_ms=34.47 detail=count=0
+user=2 table=card_comments ok=True time_ms=37.94 detail=count=0
+user=1 table=bug_templates ok=True time_ms=24.45 detail=count=0
+user=1 table=achievements ok=True time_ms=2.19 detail=count=3
+user=1 table=activity_log ok=True time_ms=10.42 detail=count=3
+user=1 table=board_columns ok=True time_ms=23.47 detail=count=4
+user=1 table=git_commits ok=True time_ms=24.53 detail=count=0
+user=1 table=webhooks ok=True time_ms=29.06 detail=count=0
+user=2 table=board_columns ok=True time_ms=33.87 detail=count=4
+user=1 table=testcase_templates ok=True time_ms=32.23 detail=count=0
+user=2 table=bugs ok=True time_ms=41.57 detail=count=24
+user=1 table=rate_limit_entries ok=True time_ms=26.38 detail=count=0
+user=1 table=board_cards ok=True time_ms=22.10 detail=count=5
+user=1 table=bug_similarity_cache ok=True time_ms=25.62 detail=count=0
+user=2 table=public_links ok=True time_ms=36.63 detail=count=0
+user=1 table=test_executions ok=True time_ms=32.50 detail=count=8
+user=2 table=card_attachments ok=True time_ms=38.15 detail=count=0
+2026-03-29 20:24:33.365627 | END total_ops=2150 passed=2150 failed=0

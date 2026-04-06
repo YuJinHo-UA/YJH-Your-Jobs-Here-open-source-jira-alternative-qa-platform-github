@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/security.php';
 require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/sidebar.php';
 
@@ -17,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($password) {
         $sql .= ', password_hash=:password_hash';
         $params[':password_hash'] = password_hash($password, PASSWORD_DEFAULT);
+        log_security_event('password_changed', [], (int)$user['id']);
     }
 
     $sql .= ' WHERE id=:id';
@@ -47,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <select name="language" class="form-select">
                         <option value="en" <?php echo $user['language'] === 'en' ? 'selected' : ''; ?>>English</option>
                         <option value="ru" <?php echo $user['language'] === 'ru' ? 'selected' : ''; ?>>Russian</option>
+                        <option value="ua" <?php echo $user['language'] === 'ua' ? 'selected' : ''; ?>>Ukrainian</option>
                     </select>
                 </div>
                 <div class="col-md-4">
@@ -56,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="mt-3">
                 <button class="btn btn-primary">Save</button>
+                <a href="/2fa-setup.php" class="btn btn-outline-secondary">2FA Setup</a>
             </div>
         </form>
     </div>

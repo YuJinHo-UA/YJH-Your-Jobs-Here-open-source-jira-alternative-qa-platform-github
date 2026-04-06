@@ -4,12 +4,20 @@ require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/sidebar.php';
 
 $user = current_user();
+$unavailable = get_user_unavailability((int)$user['id']);
 $bugs = fetch_all('SELECT * FROM bugs WHERE assignee_id = :id ORDER BY due_date LIMIT 5', [':id' => $user['id']]);
 $testRuns = fetch_all('SELECT * FROM test_runs WHERE assigned_to = :id ORDER BY created_at DESC LIMIT 5', [':id' => $user['id']]);
 $mentions = fetch_all('SELECT m.*, b.title FROM bug_mentions m JOIN bugs b ON b.id = m.bug_id WHERE m.user_id = :id ORDER BY m.created_at DESC LIMIT 5', [':id' => $user['id']]);
 ?>
 <div class="app-content">
     <h2 class="mb-3">My Day</h2>
+    <?php if ($unavailable): ?>
+        <div class="alert alert-warning mb-3">
+            ⚠️ You are marked as <strong><?php echo h((string)$unavailable['type']); ?></strong>
+            until <strong><?php echo h((string)$unavailable['end_date']); ?></strong>.
+            Tasks are temporarily not assigned to you.
+        </div>
+    <?php endif; ?>
     <div class="row g-4">
         <div class="col-lg-4">
             <div class="card p-3">
