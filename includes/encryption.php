@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 const YJH_CIPHER = 'AES-256-CBC';
 
+<<<<<<< HEAD
 function yjh_key_file_path(): string
 {
     return __DIR__ . '/../.yjh-secrets/encryption.key';
@@ -28,12 +29,19 @@ function yjh_persistent_local_key(): string
     return $generated;
 }
 
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 function yjh_encryption_key(): string
 {
     $configured = (string)(getenv('YJH_ENCRYPTION_KEY') ?: '');
     if ($configured === '') {
+<<<<<<< HEAD
         // Per-install local key fallback (not committed to git).
         $configured = yjh_persistent_local_key();
+=======
+        // Development fallback. Set YJH_ENCRYPTION_KEY in production.
+        $configured = 'change-this-dev-key-32-bytes-minimum';
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
     }
     return hash('sha256', $configured, true);
 }

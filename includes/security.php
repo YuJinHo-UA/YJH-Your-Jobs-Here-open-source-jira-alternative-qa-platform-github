@@ -2,7 +2,10 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../config/db.php';
+<<<<<<< HEAD
 require_once __DIR__ . '/logger.php';
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 
 function client_ip(): ?string
 {
@@ -31,11 +34,14 @@ function log_security_event(string $action, array $details = [], ?int $userId = 
         ':ua' => client_user_agent(),
         ':details' => json_encode($details, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
     ]);
+<<<<<<< HEAD
     yjh_log_write('security', json_encode([
         'user_id' => $userId,
         'action' => $action,
         'ip' => client_ip(),
         'details' => $details,
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: $action);
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 }
 

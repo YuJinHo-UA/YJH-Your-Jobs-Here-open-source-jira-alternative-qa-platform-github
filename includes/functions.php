@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/encryption.php';
+<<<<<<< HEAD
 require_once __DIR__ . '/logger.php';
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 require_once __DIR__ . '/security_headers.php';
 
 function h(?string $value): string
@@ -145,6 +148,7 @@ function fetch_one(string $sql, array $params = []): ?array
     return $row ?: null;
 }
 
+<<<<<<< HEAD
 function deletable_tables(): array
 {
     return [
@@ -303,6 +307,8 @@ function refresh_program_activity_doc(): void
     @file_put_contents($path, implode(PHP_EOL, $lines) . PHP_EOL);
 }
 
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 function detect_text_language(string $text): string
 {
     $normalized = trim($text);
@@ -447,6 +453,7 @@ function translate_text_cached(string $text, string $targetLang, ?string $source
     return $translated;
 }
 
+<<<<<<< HEAD
 function is_user_available(int $userId, string $dateFrom, ?string $dateTo = null): bool
 {
     if ($userId <= 0) {
@@ -496,3 +503,7 @@ function get_user_unavailability(int $userId, ?string $date = null): ?array
 }
 
 apply_security_headers();
+=======
+apply_security_headers();
+
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616

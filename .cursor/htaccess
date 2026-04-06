@@ -1,0 +1,27 @@
+# YJH Security Configuration
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Защита конфигурационных файлов
+    RewriteRule ^config/ - [F,L]
+    RewriteRule ^data/ - [F,L]
+    RewriteRule ^logs/ - [F,L]
+    RewriteRule ^backups/ - [F,L]
+    
+    # Защита скрытых файлов
+    RewriteRule ^\. - [F,L]
+</IfModule>
+
+# Защита от просмотра директорий
+Options -Indexes
+
+# Безопасные заголовки
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "DENY"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Ограничение загрузки файлов
+LimitRequestBody 10485760

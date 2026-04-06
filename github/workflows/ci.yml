@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  php-syntax-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: pdo, pdo_sqlite, sqlite3
+        tools: composer
+    
+    - name: Validate composer.json
+      run: composer validate --strict
+    
+    - name: Check PHP syntax
+      run: |
+        find . -name "*.php" -not -path "./vendor/*" -not -path "./tests/*" -exec php -l {} \;
+    
+    - name: Check for security issues (basic)
+      run: |
+        grep -r "eval(" --include="*.php" --exclude-dir=vendor && exit 1 || exit 0
+        grep -r "base64_decode" --include="*.php" --exclude-dir=vendor && exit 1 || exit 0

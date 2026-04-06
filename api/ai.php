@@ -3,9 +3,12 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../ai/ai_helper.php';
+<<<<<<< HEAD
 require_once __DIR__ . '/../includes/rate_limit.php';
 require_once __DIR__ . '/../includes/security.php';
 require_once __DIR__ . '/../includes/logger.php';
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 
 session_start();
 $user = current_user();
@@ -17,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     json_response(['error' => 'Method not allowed'], 405);
 }
 
+<<<<<<< HEAD
 $rateScope = 'ai_api';
 $rateIdentifier = isset($user['id']) ? (string)$user['id'] : null;
 if (!check_rate_limit($rateScope, $rateIdentifier, 30, 300)) {
@@ -25,6 +29,8 @@ if (!check_rate_limit($rateScope, $rateIdentifier, 30, 300)) {
 }
 add_rate_limit_attempt($rateScope, $rateIdentifier);
 
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 $payload = json_decode(file_get_contents('php://input'), true) ?: [];
 $action = trim((string)($payload['action'] ?? ''));
 if ($action === '') {
@@ -92,11 +98,15 @@ try {
             json_response(['error' => 'Action not found'], 404);
     }
 } catch (Throwable $e) {
+<<<<<<< HEAD
     log_security_event('ai_processing_failed', [
         'action' => $action,
         'message' => $e->getMessage(),
     ], (int)$user['id']);
     json_response(['error' => 'AI processing failed'], 500);
+=======
+    json_response(['error' => 'AI processing failed', 'details' => $e->getMessage()], 500);
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 }
 
 function decode_json_safely(string $text): array
@@ -115,6 +125,7 @@ function duration_ms(float $startedAt): int
 
 function write_ai_log(int $userId, string $actionType, string $prompt, string $response, int $tokens, int $durationMs): void
 {
+<<<<<<< HEAD
     $safePrompt = redact_sensitive_data($prompt);
     $safeResponse = redact_sensitive_data($response);
     $encryptLogs = getenv('YJH_AI_LOG_ENCRYPT');
@@ -124,10 +135,13 @@ function write_ai_log(int $userId, string $actionType, string $prompt, string $r
         $safeResponse = 'enc:' . encrypt_value($safeResponse);
     }
 
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
     $stmt = db()->prepare('INSERT INTO ai_logs (user_id, action_type, prompt, response, tokens_used, duration_ms) VALUES (:user_id, :action_type, :prompt, :response, :tokens_used, :duration_ms)');
     $stmt->execute([
         ':user_id' => $userId,
         ':action_type' => $actionType,
+<<<<<<< HEAD
         ':prompt' => $safePrompt,
         ':response' => $safeResponse,
         ':tokens_used' => $tokens,
@@ -156,6 +170,13 @@ function redact_sensitive_data(string $text): string
         $clean = (string)preg_replace($pattern, $replacement, $clean);
     }
     return $clean;
+=======
+        ':prompt' => $prompt,
+        ':response' => $response,
+        ':tokens_used' => $tokens,
+        ':duration_ms' => $durationMs,
+    ]);
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 }
 
 function build_report_stats(int $days): array

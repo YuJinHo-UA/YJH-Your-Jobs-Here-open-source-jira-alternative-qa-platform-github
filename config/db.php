@@ -21,7 +21,10 @@ function db(): PDO
     initialize_schema($pdo);
     apply_security_migrations($pdo);
     apply_ai_migrations($pdo);
+<<<<<<< HEAD
     apply_fk_migrations($pdo);
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 
     if ($isNew) {
         seed_demo_data($pdo);
@@ -727,6 +730,7 @@ function apply_ai_migrations(PDO $pdo): void
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_ai_templates_user_type ON ai_templates(user_id, template_type)');
 }
 
+<<<<<<< HEAD
 function apply_fk_migrations(PDO $pdo): void
 {
     repair_legacy_bug_fk_targets($pdo);
@@ -843,6 +847,8 @@ function repair_legacy_bug_fk_targets(PDO $pdo): void
     }
 }
 
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 function ensure_column(PDO $pdo, string $table, string $column, string $definition): void
 {
     $stmt = $pdo->query("PRAGMA table_info($table)");

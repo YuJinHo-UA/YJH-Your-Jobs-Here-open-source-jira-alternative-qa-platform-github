@@ -458,6 +458,12 @@ foreach ($cards as $card) {
             </button>
         </div>
 
+        <div class="kanban-add-column-wrap mb-3 text-center">
+            <button type="button" class="btn btn-primary" id="kanbanAddColumnBtn" data-board-id="<?php echo (int)$boardId; ?>">
+                <i class="fa-solid fa-plus me-1"></i>Add column
+            </button>
+        </div>
+
         <div class="kanban-board">
             <?php foreach ($columns as $column): ?>
                 <?php $columnCards = $cardsByColumn[$column['id']] ?? []; ?>

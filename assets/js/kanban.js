@@ -10,9 +10,12 @@
     const columnNameInput = document.getElementById('kanbanColumnNameInput');
     const columnCreateSubmit = document.getElementById('kanbanColumnCreateSubmit');
     const columnModal = columnModalEl && window.bootstrap ? new window.bootstrap.Modal(columnModalEl) : null;
+<<<<<<< HEAD
     const cardTypeSelect = document.getElementById('kanbanCardType');
     const bugPickerWrap = document.getElementById('kanbanBugPickerWrap');
     const testCasePickerWrap = document.getElementById('kanbanTestCasePickerWrap');
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 
     if (columnModalEl) {
         const modalTitle = columnModalEl.querySelector('.modal-title');
@@ -317,6 +320,43 @@
         };
         cardTypeSelect.addEventListener('change', toggleBugPicker);
         toggleBugPicker();
+    }
+
+    if (addColumnBtn) {
+        addColumnBtn.addEventListener('click', () => {
+            if (!columnModal || !columnNameInput) return;
+            columnNameInput.value = '';
+            columnModal.show();
+            setTimeout(() => columnNameInput.focus(), 120);
+        });
+    }
+
+    if (columnCreateSubmit) {
+        columnCreateSubmit.addEventListener('click', async () => {
+            const boardId = addColumnBtn ? addColumnBtn.dataset.boardId : '';
+            const name = columnNameInput ? columnNameInput.value.trim() : '';
+            if (!name) return;
+
+            try {
+                await apiCall({
+                    action: 'create_column',
+                    board_id: boardId,
+                    name
+                });
+                window.location.reload();
+            } catch (error) {
+                alert(error.message || t('Unable to create column'));
+            }
+        });
+    }
+
+    if (columnNameInput && columnCreateSubmit) {
+        columnNameInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                columnCreateSubmit.click();
+            }
+        });
     }
 
     if (addColumnBtn) {

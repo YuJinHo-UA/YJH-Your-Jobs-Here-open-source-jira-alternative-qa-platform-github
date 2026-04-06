@@ -746,6 +746,7 @@ html.theme-dark .table a:hover {
     border-radius: 8px;
 }
 
+<<<<<<< HEAD
 .test-cases-table-wrap {
     overflow-x: auto;
 }
@@ -793,6 +794,8 @@ html.theme-dark .table a:hover {
     }
 }
 
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 .theme-dark .admin-tabs {
     border-bottom-color: rgba(148, 163, 184, 0.28);
 }

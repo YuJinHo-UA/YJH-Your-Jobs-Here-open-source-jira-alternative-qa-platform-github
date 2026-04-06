@@ -4,16 +4,22 @@ require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/sidebar.php';
 
 $user = current_user();
+<<<<<<< HEAD
 $isAdmin = (($user['role'] ?? '') === 'admin');
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 $editId = (int)get_param('edit_id', 0);
 $editItem = null;
 if ($editId > 0) {
     $editItem = fetch_one('SELECT * FROM user_availability WHERE id = :id', [':id' => $editId]);
+<<<<<<< HEAD
     if ($editItem && !$isAdmin && (int)$editItem['user_id'] !== (int)$user['id']) {
         $editItem = null;
         add_toast('Access denied', 'danger');
         redirect('/calendar.php');
     }
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -22,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $itemId = (int)post_param('item_id', 0);
 
     if ($action === 'delete' && $itemId > 0) {
+<<<<<<< HEAD
         $params = [':id' => $itemId];
         $sql = 'DELETE FROM user_availability WHERE id = :id';
         if (!$isAdmin) {
@@ -30,10 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $stmt = db()->prepare($sql);
         $stmt->execute($params);
+=======
+        $stmt = db()->prepare('DELETE FROM user_availability WHERE id = :id');
+        $stmt->execute([':id' => $itemId]);
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
         add_toast('Availability deleted', 'success');
         redirect('/calendar.php');
     }
 
+<<<<<<< HEAD
     $targetUserId = (int)$user['id'];
     if ($isAdmin && (int)post_param('target_user_id', 0) > 0) {
         $targetUserId = (int)post_param('target_user_id', 0);
@@ -41,11 +53,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($itemId > 0) {
         $params = [
+=======
+    if ($itemId > 0) {
+        $stmt = db()->prepare('UPDATE user_availability SET type=:type, start_date=:start_date, end_date=:end_date, reason=:reason WHERE id=:id');
+        $stmt->execute([
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
             ':type' => post_param('type'),
             ':start_date' => post_param('start_date'),
             ':end_date' => post_param('end_date'),
             ':reason' => post_param('reason'),
             ':id' => $itemId,
+<<<<<<< HEAD
             ':target_user_id' => $targetUserId,
         ];
         $sql = 'UPDATE user_availability SET user_id=:target_user_id, type=:type, start_date=:start_date, end_date=:end_date, reason=:reason WHERE id=:id';
@@ -55,11 +73,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $stmt = db()->prepare($sql);
         $stmt->execute($params);
+=======
+        ]);
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
         add_toast('Availability updated', 'success');
     } else {
         $stmt = db()->prepare('INSERT INTO user_availability (user_id, type, start_date, end_date, reason) VALUES (:user_id, :type, :start_date, :end_date, :reason)');
         $stmt->execute([
+<<<<<<< HEAD
             ':user_id' => $targetUserId,
+=======
+            ':user_id' => $user['id'],
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
             ':type' => post_param('type'),
             ':start_date' => post_param('start_date'),
             ':end_date' => post_param('end_date'),
@@ -85,6 +110,7 @@ $allUsers = $isAdmin ? fetch_all('SELECT id, username FROM users ORDER BY userna
                     <input type="hidden" name="csrf_token" value="<?php echo h(csrf_token()); ?>">
                     <input type="hidden" name="item_id" value="<?php echo (int)($editItem['id'] ?? 0); ?>">
                     <input type="hidden" name="action" value="save">
+<<<<<<< HEAD
                     <?php if ($isAdmin): ?>
                         <select class="form-select mb-2" name="target_user_id">
                             <?php foreach ($allUsers as $u): ?>
@@ -94,6 +120,8 @@ $allUsers = $isAdmin ? fetch_all('SELECT id, username FROM users ORDER BY userna
                             <?php endforeach; ?>
                         </select>
                     <?php endif; ?>
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
                     <select class="form-select mb-2" name="type">
                         <option value="vacation" <?php echo ($editItem['type'] ?? 'vacation') === 'vacation' ? 'selected' : ''; ?>>Vacation</option>
                         <option value="sick_leave" <?php echo ($editItem['type'] ?? 'vacation') === 'sick_leave' ? 'selected' : ''; ?>>Sick leave</option>
@@ -122,7 +150,10 @@ $allUsers = $isAdmin ? fetch_all('SELECT id, username FROM users ORDER BY userna
                             <th>Type</th>
                             <th>From</th>
                             <th>To</th>
+<<<<<<< HEAD
                             <th>Reason</th>
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
                             <th></th>
                         </tr>
                     </thead>
@@ -149,7 +180,10 @@ $allUsers = $isAdmin ? fetch_all('SELECT id, username FROM users ORDER BY userna
                             <td><?php echo $icon . ' ' . h($row['type']); ?></td>
                             <td><?php echo h($row['start_date']); ?></td>
                             <td><?php echo h($row['end_date']); ?></td>
+<<<<<<< HEAD
                             <td><?php echo h((string)($row['reason'] ?? '')); ?></td>
+=======
+>>>>>>> 7e7a5ae49ac6caacc4b2a0ad95dd06bd60dfa616
                             <td class="d-flex gap-2">
                                 <a class="btn btn-sm btn-outline-primary" href="/calendar.php?edit_id=<?php echo (int)$row['id']; ?>">Edit</a>
                                 <form method="post" onsubmit="return confirm('Delete record?');">

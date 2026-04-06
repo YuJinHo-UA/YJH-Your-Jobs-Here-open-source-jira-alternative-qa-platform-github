@@ -1,20 +1,26 @@
+# Development
+database.sqlite
+*.sqlite
+*.sqlite-journal
+backup/
+backups/
 .idea/
+.vscode/
+.DS_Store
+
+# Config (except example)
+config/installed.lock
+config/database.php
+
+# Logs
+*.log
+logs/
+
+# Dependencies
 vendor/
 node_modules/
 
-# Local runtime data
-database.sqlite
-uploads/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs/temp
-*.log
-*.tmp
-*.cache
-
-# Local secrets
-.yjh-secrets/
-
+# IDE
+*.swp
+*.swo
+*~
