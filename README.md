@@ -1,8 +1,19 @@
+# YJH - "Your Job's Here" Quality Management Platform
+
+YJH is an integrated QA platform that combines bug tracking, test management, wiki knowledge base, kanban, and release risk analytics in one lightweight PHP + SQLite stack.
+
+## Why YJH
+- One tool instead of Jira + TestRail + Confluence split.
+- Fast local deployment (no heavy infra required).
+- Built-in traceability: `test case -> execution -> bug -> commit`.
+- Product-level QA features: Risk Engine, checklist-driven testing, auto bug creation, wiki versioning.
+
 ![CI](https://github.com/YuJinHo-UA/YJH-Your-Jobs-Here-open-source-jira-alternative-qa-platform-github/actions/workflows/ci.yml/badge.svg)
 ![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-blue)
 ![SQLite](https://img.shields.io/badge/Database-SQLite-green)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Version](https://img.shields.io/badge/version-1.0.0-orange)
+
 ## 📦 Core Modules
 
 ### 🐛 Bugs Management
@@ -85,19 +96,6 @@
 
 YJH is an integrated QA platform that combines bug tracking, test management, wiki knowledge base, kanban, and release risk analytics in one lightweight PHP + SQLite stack.
 
-## Why YJH
-- One tool instead of Jira + TestRail + Confluence split.
-- Fast local deployment (no heavy infra required).
-- Built-in traceability: `test case -> execution -> bug -> commit`.
-- Product-level QA features: Risk Engine, checklist-driven testing, auto bug creation, wiki versioning.
-
-## Core Modules
-- Bugs: `bugs.php`, `bug.php`, `api/bugs.php`
-- Test Management: `testplans.php`, `testplan.php`, `testcase.php`, `testruns.php`, `testrun.php`
-- Wiki: `wiki.php`, `wiki-page.php`, `api/wiki.php`
-- Kanban: `kanban.php`, `api/kanban.php`
-- Analytics: `index.php`, `reports.php`, `assets/js/charts.js`
-- Global Search: `api/search.php`, `assets/js/search.js`
 
 ## Tech Stack
 - Backend: PHP (procedural MVC-style pages + API endpoints)
